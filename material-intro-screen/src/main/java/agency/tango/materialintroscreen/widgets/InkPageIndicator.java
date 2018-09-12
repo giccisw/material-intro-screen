@@ -31,7 +31,7 @@ import android.graphics.RectF;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.view.CustomViewPager;
+import android.support.v4.view.ViewPager;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.util.AttributeSet;
 import android.view.View;
@@ -42,7 +42,7 @@ import java.util.Arrays;
 import agency.tango.materialintroscreen.R;
 
 public class InkPageIndicator extends View
-        implements CustomViewPager.OnPageChangeListener, View.OnAttachStateChangeListener {
+        implements ViewPager.OnPageChangeListener, View.OnAttachStateChangeListener {
 
     // defaults
     private static final int DEFAULT_DOT_SIZE = 8;

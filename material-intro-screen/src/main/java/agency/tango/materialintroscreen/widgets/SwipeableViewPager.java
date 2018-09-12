@@ -1,8 +1,8 @@
 package agency.tango.materialintroscreen.widgets;
 
 import android.content.Context;
-import android.support.v4.view.CustomViewPager;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -11,7 +11,7 @@ import agency.tango.materialintroscreen.ISlideErrorHandler;
 import agency.tango.materialintroscreen.adapter.SlidesAdapter;
 
 @SuppressWarnings("PMD.SingularField")
-public class SwipeableViewPager extends CustomViewPager {
+public class SwipeableViewPager extends ViewPager {
 
     private float startPos = 0;
     private int currentIt;
@@ -64,7 +64,8 @@ public class SwipeableViewPager extends CustomViewPager {
                 return super.onTouchEvent(event);
             case (MotionEvent.ACTION_UP):
                 if (isSwipingNotAllowed(event)) {
-                    smoothScrollTo(getWidth() * currentIt, 0);
+                    // FIXME
+//                    smoothScrollTo(getWidth() * currentIt, 0);
                     errorHandler.handleError();
                     return true;
                 }
