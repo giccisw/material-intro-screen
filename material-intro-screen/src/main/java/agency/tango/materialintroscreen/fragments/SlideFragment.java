@@ -3,6 +3,7 @@ package agency.tango.materialintroscreen.fragments;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
@@ -58,12 +59,12 @@ public class SlideFragment extends SlideFragmentBase {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.mis_fragment_slide, container, false);
-        titleTextView = (TextView) view.findViewById(R.id.txt_title_slide);
-        descriptionTextView = (TextView) view.findViewById(R.id.txt_description_slide);
-        imageView = (ImageView) view.findViewById(R.id.image_slide);
+        titleTextView = view.findViewById(R.id.txt_title_slide);
+        descriptionTextView = view.findViewById(R.id.txt_description_slide);
+        imageView = view.findViewById(R.id.image_slide);
         initializeView();
         return view;
     }
@@ -112,6 +113,7 @@ public class SlideFragment extends SlideFragmentBase {
 
     private void initializeView() {
         Bundle bundle = getArguments();
+        assert bundle != null;
         backgroundColor = bundle.getInt(BACKGROUND_COLOR);
         buttonsColor = bundle.getInt(BUTTONS_COLOR);
         image = bundle.getInt(IMAGE, 0);
