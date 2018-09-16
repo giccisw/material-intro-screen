@@ -85,15 +85,15 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
         setContentView(R.layout.mis_activity_material_intro);
 
-        overScrollLayout = (OverScrollViewPager) findViewById(R.id.view_pager_slides);
+        overScrollLayout = findViewById(R.id.view_pager_slides);
         viewPager = overScrollLayout.getOverScrollView();
-        pageIndicator = (InkPageIndicator) findViewById(R.id.indicator);
-        backButton = (ImageButton) findViewById(R.id.button_back);
-        nextButton = (ImageButton) findViewById(R.id.button_next);
-        skipButton = (ImageButton) findViewById(R.id.button_skip);
-        messageButton = (Button) findViewById(R.id.button_message);
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout_slide);
-        navigationView = (LinearLayout) findViewById(R.id.navigation_view);
+        pageIndicator = findViewById(R.id.indicator);
+        backButton = findViewById(R.id.button_back);
+        nextButton = findViewById(R.id.button_next);
+        skipButton = findViewById(R.id.button_skip);
+        messageButton = findViewById(R.id.button_message);
+        coordinatorLayout = findViewById(R.id.coordinator_layout_slide);
+        navigationView = findViewById(R.id.navigation_view);
 
         adapter = new SlidesAdapter(getSupportFragmentManager());
 
