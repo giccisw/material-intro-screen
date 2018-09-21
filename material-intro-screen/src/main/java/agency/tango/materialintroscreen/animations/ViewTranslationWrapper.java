@@ -7,7 +7,6 @@ import android.view.animation.AnimationUtils;
 
 import agency.tango.materialintroscreen.animations.translations.NoTranslation;
 
-@SuppressWarnings("WeakerAccess")
 public class ViewTranslationWrapper {
     private View view;
 

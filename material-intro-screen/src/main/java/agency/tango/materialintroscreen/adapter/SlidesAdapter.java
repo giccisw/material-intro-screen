@@ -1,15 +1,16 @@
 package agency.tango.materialintroscreen.adapter;
 
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 
 import agency.tango.materialintroscreen.fragments.SlideFragmentBase;
 
-public class SlidesAdapter extends FragmentStatePagerAdapter {
+/** Stores the fragments for the slides */
+public class SlidesAdapter extends FragmentPagerAdapter {
 
+    /** List of available slides */
     private ArrayList<SlideFragmentBase> fragments = new ArrayList<>();
 
     public SlidesAdapter(FragmentManager fragmentManager) {
@@ -19,13 +20,6 @@ public class SlidesAdapter extends FragmentStatePagerAdapter {
     @Override
     public SlideFragmentBase getItem(int position) {
         return fragments.get(position);
-    }
-
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        SlideFragmentBase fragment = (SlideFragmentBase) super.instantiateItem(container, position);
-        fragments.set(position, fragment);
-        return fragment;
     }
 
     @Override

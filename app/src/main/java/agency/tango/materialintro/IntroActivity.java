@@ -2,15 +2,12 @@ package agency.tango.materialintro;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.support.annotation.FloatRange;
 import android.support.annotation.Nullable;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import agency.tango.materialintroscreen.MaterialIntroActivity;
 import agency.tango.materialintroscreen.behaviours.MessageButtonBehaviour;
-import agency.tango.materialintroscreen.animations.IViewTranslation;
 import agency.tango.materialintroscreen.fragments.SlideFragmentBuilder;
 import agency.tango.materialintroscreen.listeners.click.MessageButtonClickListener;
 
@@ -20,16 +17,16 @@ public class IntroActivity extends MaterialIntroActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         enableLastSlideAlphaExitTransition(true);
-        setSkipButtonVisible();
+//        setSkipButtonVisible();
 
-        getBackButtonTranslationWrapper()
-                .setEnterTranslation(new IViewTranslation() {
-                    @Override
-                    public void translate(View view,
-                                          @FloatRange(from = 0, to = 1.0) float percentage) {
-                        view.setAlpha(percentage);
-                    }
-                });
+//        getBackButtonTranslationWrapper()
+//                .setEnterTranslation(new IViewTranslation() {
+//                    @Override
+//                    public void translate(View view,
+//                                          @FloatRange(from = 0, to = 1.0) float percentage) {
+//                        view.setAlpha(percentage);
+//                    }
+//                });
 
         addSlide(new SlideFragmentBuilder()
                         .backgroundColor(R.color.first_slide_background)

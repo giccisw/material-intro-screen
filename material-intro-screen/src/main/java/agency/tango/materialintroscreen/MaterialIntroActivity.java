@@ -46,6 +46,7 @@ import agency.tango.materialintroscreen.widgets.SwipeableViewPager;
 @SuppressWarnings("unused")
 public abstract class MaterialIntroActivity extends AppCompatActivity {
 
+    // the views
     private SwipeableViewPager viewPager;
     private InkPageIndicator pageIndicator;
     private SlidesAdapter adapter;
@@ -57,6 +58,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
     private LinearLayout navigationView;
     private OverScrollViewPager overScrollLayout;
 
+    /** Calculates color tansitions */
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
 
     private ViewTranslationWrapper nextButtonTranslationWrapper;
@@ -70,6 +72,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
     private View.OnClickListener permissionNotGrantedClickListener;
     private View.OnClickListener finishScreenClickListener;
 
+    /** Configuration of message buttons */
     private SparseArray<MessageButtonBehaviour> messageButtonBehaviours = new SparseArray<>();
 
     @Override
@@ -77,14 +80,17 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // translucent windows where available
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             Window window = getWindow();
             window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
 
+        // set our layout
         setContentView(R.layout.mis_activity_material_intro);
 
+        // get views
         overScrollLayout = findViewById(R.id.view_pager_slides);
         viewPager = overScrollLayout.getOverScrollView();
         pageIndicator = findViewById(R.id.indicator);
@@ -95,19 +101,80 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         coordinatorLayout = findViewById(R.id.coordinator_layout_slide);
         navigationView = findViewById(R.id.navigation_view);
 
+        // create the adapter for the slides
         adapter = new SlidesAdapter(getSupportFragmentManager());
 
-        viewPager.setAdapter(adapter);
-        viewPager.setOffscreenPageLimit(2);
-        pageIndicator.setViewPager(viewPager);
-
         nextButtonTranslationWrapper = new NextButtonTranslationWrapper(nextButton);
-        initOnPageChangeListeners();
+        backButtonTranslationWrapper = new BackButtonTranslationWrapper(backButton);
+        pageIndicatorTranslationWrapper = new PageIndicatorTranslationWrapper(pageIndicator);
+        viewPagerTranslationWrapper = new ViewPagerTranslationWrapper(viewPager);
+        skipButtonTranslationWrapper = new SkipButtonTranslationWrapper(skipButton);
+
+        messageButtonBehaviourOnPageSelected = new MessageButtonBehaviourOnPageSelected(
+                messageButton, adapter, messageButtonBehaviours);
+
+        // register the finish action for the over scroll layout
+        overScrollLayout.registerFinishListener(new IFinishListener() {
+            @Override
+            public void onFinish() {
+                performFinish();
+            }
+        });
+
+        // configure the view pager
+        viewPager.setOffscreenPageLimit(2);
+        viewPager.setAdapter(adapter);
+        viewPager.registerSlideErrorHandler(new ISlideErrorHandler() {
+            @Override
+            public void handleError() {
+                errorOccurred(adapter.getItem(viewPager.getCurrentItem()));
+            }
+        });
+        viewPager.addOnPageChangeListener(new ViewBehavioursOnPageChangeListener(adapter)
+                .registerViewTranslationWrapper(nextButtonTranslationWrapper)
+                .registerViewTranslationWrapper(backButtonTranslationWrapper)
+                .registerViewTranslationWrapper(pageIndicatorTranslationWrapper)
+                .registerViewTranslationWrapper(viewPagerTranslationWrapper)
+                .registerViewTranslationWrapper(skipButtonTranslationWrapper)
+
+                .registerOnPageScrolled(new IPageScrolledListener() {
+                    @Override
+                    public void pageScrolled(final int position, float offset) {
+                        viewPager.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (adapter.getItem(position).hasNeededPermissionsToGrant()
+                                        || !adapter.getItem(position).canMoveFurther()) {
+                                    viewPager.setCurrentItem(position, true);
+                                    pageIndicator.clearJoiningFractions();
+                                }
+                            }
+                        });
+                    }
+                })
+                .registerOnPageScrolled(new ColorTransitionScrollListener())
+                .registerOnPageScrolled(new ParallaxScrollListener(adapter))
+
+                .registerPageSelectedListener(messageButtonBehaviourOnPageSelected)
+                .registerPageSelectedListener(new IPageSelectedListener() {
+                    @Override
+                    public void pageSelected(int position) {
+                        nextButtonBehaviour(position, adapter.getItem(position));
+
+                        if (adapter.shouldFinish(position)) {
+                            performFinish();
+                        }
+                    }
+                }));
+
+        // attach the page indicator to the view pager
+        pageIndicator.setViewPager(viewPager);
 
         permissionNotGrantedClickListener = new PermissionNotGrantedClickListener(this,
                 nextButtonTranslationWrapper);
         finishScreenClickListener = new FinishScreenClickListener();
 
+        // show back button by default
         setBackButtonVisible();
 
         viewPager.post(new Runnable() {
@@ -197,9 +264,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         messageButtonBehaviours.put(adapter.getLastItemPosition(), messageButtonBehaviour);
     }
 
-    /**
-     * Set skip button instead of back button
-     */
+    /** Set skip button instead of back button */
     public void setSkipButtonVisible() {
         backButton.setVisibility(View.GONE);
 
@@ -220,9 +285,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Set back button visible
-     */
+    /** Set back button visible */
     public void setBackButtonVisible() {
         skipButton.setVisibility(View.GONE);
 
@@ -235,17 +298,14 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Hides any back button
-     */
-    public void hideBackButton() {
+    /** Hides back  button */
+    public void hideBackSkipButton() {
         backButton.setVisibility(View.INVISIBLE);
         skipButton.setVisibility(View.GONE);
     }
 
     /**
      * Get translation wrapper for next button
-     *
      * @return ViewTranslationWrapper
      */
     public ViewTranslationWrapper getNextButtonTranslationWrapper() {
@@ -254,7 +314,6 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
     /**
      * Get translation wrapper for back button
-     *
      * @return ViewTranslationWrapper
      */
     public ViewTranslationWrapper getBackButtonTranslationWrapper() {
@@ -263,7 +322,6 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
     /**
      * Get translation wrapper for page indicator
-     *
      * @return ViewTranslationWrapper
      */
     public ViewTranslationWrapper getPageIndicatorTranslationWrapper() {
@@ -281,7 +339,6 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
     /**
      * Get translation wrapper for skip button
-     *
      * @return ViewTranslationWrapper
      */
     public ViewTranslationWrapper getSkipButtonTranslationWrapper() {
@@ -290,7 +347,6 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
     /**
      * Set if last screen should be able to exit with alpha transition
-     *
      * @param enableAlphaExitTransition should enable alpha exit transition
      */
     public void enableLastSlideAlphaExitTransition(boolean enableAlphaExitTransition) {
@@ -299,80 +355,16 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
     /**
      * Show snackbar message
-     *
      * @param message Message which will be visible to user
      */
     public void showMessage(String message) {
         showError(message);
     }
 
-    /**
-     * Override in order to perform some action after passing last slide
-     */
+    /** Override in order to perform some action after passing last slide */
     public void onLastSlidePassed() {
         // This method is intentionally empty, because we didn't want to make this method
         // abstract as it would force user to implement this, even if he wouldn't like to.
-    }
-
-    private void initOnPageChangeListeners() {
-        messageButtonBehaviourOnPageSelected = new MessageButtonBehaviourOnPageSelected(
-                messageButton, adapter, messageButtonBehaviours);
-
-        backButtonTranslationWrapper = new BackButtonTranslationWrapper(backButton);
-        pageIndicatorTranslationWrapper = new PageIndicatorTranslationWrapper(pageIndicator);
-        viewPagerTranslationWrapper = new ViewPagerTranslationWrapper(viewPager);
-        skipButtonTranslationWrapper = new SkipButtonTranslationWrapper(skipButton);
-
-        overScrollLayout.registerFinishListener(new IFinishListener() {
-            @Override
-            public void onFinish() {
-                performFinish();
-            }
-        });
-
-        viewPager.registerSlideErrorHandler(new ISlideErrorHandler() {
-            @Override
-            public void handleError() {
-                errorOccurred(adapter.getItem(viewPager.getCurrentItem()));
-            }
-        });
-
-        viewPager.addOnPageChangeListener(new ViewBehavioursOnPageChangeListener(adapter)
-                .registerViewTranslationWrapper(nextButtonTranslationWrapper)
-                .registerViewTranslationWrapper(backButtonTranslationWrapper)
-                .registerViewTranslationWrapper(pageIndicatorTranslationWrapper)
-                .registerViewTranslationWrapper(viewPagerTranslationWrapper)
-                .registerViewTranslationWrapper(skipButtonTranslationWrapper)
-
-                .registerOnPageScrolled(new IPageScrolledListener() {
-                    @Override
-                    public void pageScrolled(final int position, float offset) {
-                        viewPager.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (adapter.getItem(position).hasNeededPermissionsToGrant()
-                                        || !adapter.getItem(position).canMoveFurther()) {
-                                    viewPager.setCurrentItem(position, true);
-                                    pageIndicator.clearJoiningFractions();
-                                }
-                            }
-                        });
-                    }
-                })
-                .registerOnPageScrolled(new ColorTransitionScrollListener())
-                .registerOnPageScrolled(new ParallaxScrollListener(adapter))
-
-                .registerPageSelectedListener(messageButtonBehaviourOnPageSelected)
-                .registerPageSelectedListener(new IPageSelectedListener() {
-                    @Override
-                    public void pageSelected(int position) {
-                        nextButtonBehaviour(position, adapter.getItem(position));
-
-                        if (adapter.shouldFinish(position)) {
-                            performFinish();
-                        }
-                    }
-                }));
     }
 
     @SuppressWarnings("PointlessBooleanExpression")
