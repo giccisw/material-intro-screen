@@ -1,7 +1,6 @@
 package agency.tango.materialintroscreen.widgets;
 
 import android.content.Context;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -10,12 +9,13 @@ import android.view.MotionEvent;
 import agency.tango.materialintroscreen.ISlideErrorHandler;
 import agency.tango.materialintroscreen.adapter.SlidesAdapter;
 
-@SuppressWarnings("PMD.SingularField")
+/** Disables swiping when needed */
 public class SwipeableViewPager extends ViewPager {
+
+    private boolean swipingAllowed;
 
     private float startPos = 0;
     private int currentIt;
-    private boolean swipingAllowed;
     private boolean alphaExitTransitionEnabled = false;
     private ISlideErrorHandler errorHandler;
 
@@ -25,21 +25,16 @@ public class SwipeableViewPager extends ViewPager {
     }
 
     @Override
-    public boolean onInterceptTouchEvent(final MotionEvent event) {
-        int action = MotionEventCompat.getActionMasked(event);
-
-        switch (action) {
+    public boolean onInterceptTouchEvent(final MotionEvent event)
+    {
+        switch (event.getActionMasked()) {
             case (MotionEvent.ACTION_DOWN):
                 return super.onInterceptTouchEvent(event);
             case (MotionEvent.ACTION_MOVE):
-                if (!swipingAllowed) {
-                    return false;
-                }
+                if (!swipingAllowed) return false;
                 return super.onInterceptTouchEvent(event);
             case (MotionEvent.ACTION_UP):
-                if (!swipingAllowed) {
-                    return false;
-                }
+                if (!swipingAllowed) return false;
                 return super.onInterceptTouchEvent(event);
             default:
                 return super.onInterceptTouchEvent(event);
@@ -47,10 +42,9 @@ public class SwipeableViewPager extends ViewPager {
     }
 
     @Override
-    public boolean onTouchEvent(final MotionEvent event) {
-        int action = MotionEventCompat.getActionMasked(event);
-
-        switch (action) {
+    public boolean onTouchEvent(final MotionEvent event)
+    {
+        switch (event.getActionMasked()) {
             case (MotionEvent.ACTION_DOWN):
                 startPos = event.getX();
                 currentIt = getCurrentItem();

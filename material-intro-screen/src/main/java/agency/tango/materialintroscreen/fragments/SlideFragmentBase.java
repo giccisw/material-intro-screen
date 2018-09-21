@@ -55,15 +55,10 @@ public class SlideFragmentBase extends ParallaxFragment {
         return R.string.mis_please_grant_permissions;
     }
 
-    public boolean hasAnyPermissionsToGrant() {
-        if (!isAndroidVersionSupportingPermissions()) {
-            return false;
-        }
-
+    public boolean hasAnyPermissionsToGrant()
+    {
         boolean hasPermissionToGrant = hasPermissionsToGrant(neededPermissions());
-        if (!hasPermissionToGrant) {
-            hasPermissionToGrant = hasPermissionsToGrant(possiblePermissions());
-        }
+        if (!hasPermissionToGrant) hasPermissionToGrant = hasPermissionsToGrant(possiblePermissions());
         return hasPermissionToGrant;
     }
 
@@ -71,8 +66,8 @@ public class SlideFragmentBase extends ParallaxFragment {
         return hasPermissionsToGrant(neededPermissions());
     }
 
-    @SuppressWarnings({"PMD.CollapsibleIfStatements"})
-    public void askForPermissions() {
+    public void askForPermissions()
+    {
         ArrayList<String> notGrantedPermissions = new ArrayList<>();
 
         if (neededPermissions() != null) {
@@ -101,33 +96,26 @@ public class SlideFragmentBase extends ParallaxFragment {
                 .requestPermissions(getActivity(), permissionsToGrant, PERMISSIONS_REQUEST_CODE);
     }
 
-    @SuppressWarnings({"PMD.CollapsibleIfStatements"})
-    private boolean hasPermissionsToGrant(String[] permissions) {
-        if (!isAndroidVersionSupportingPermissions()) {
-            return false;
-        }
+    private boolean hasPermissionsToGrant(String[] permissions)
+    {
+        if (isAndroidVersionNotSupportingPermissions()) return false;
 
-        if (permissions != null) {
-            for (String permission : permissions) {
-                if (!TextUtils.isEmpty(permission)) {
-                    if (ContextCompat.checkSelfPermission(getContext(), permission)
-                            != PackageManager.PERMISSION_GRANTED) {
+        if (permissions != null)
+            for (String permission : permissions)
+                if (!TextUtils.isEmpty(permission) &&
+                    ContextCompat.checkSelfPermission(getContext(), permission) != PackageManager.PERMISSION_GRANTED)
                         return true;
-                    }
-                }
-            }
-        }
+
         return false;
     }
 
-    @SuppressWarnings("SuspiciousMethodCalls")
     private String[] removeEmptyAndNullStrings(final ArrayList<String> permissions) {
         List<String> list = new ArrayList<>(permissions);
         list.removeAll(Collections.singleton(null));
         return list.toArray(new String[list.size()]);
     }
 
-    private boolean isAndroidVersionSupportingPermissions() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    private boolean isAndroidVersionNotSupportingPermissions() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M;
     }
 }

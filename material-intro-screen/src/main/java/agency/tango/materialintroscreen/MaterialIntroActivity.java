@@ -193,7 +193,8 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
+            @NonNull int[] grantResults)
+    {
         SlideFragmentBase fragment = adapter.getItem(viewPager.getCurrentItem());
         boolean hasPermissionToGrant = fragment.hasNeededPermissionsToGrant();
         if (!hasPermissionToGrant) {
@@ -216,9 +217,8 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_CENTER:
-                if (messageButtonBehaviours.get(viewPager.getCurrentItem()) != null) {
+                if (messageButtonBehaviours.get(viewPager.getCurrentItem()) != null)
                     messageButton.performClick();
-                }
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 int position = viewPager.getCurrentItem();
