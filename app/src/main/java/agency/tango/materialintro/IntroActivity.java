@@ -79,6 +79,14 @@ public class IntroActivity extends MaterialIntroActivity {
                 .title("That's it")
                 .description("Would you join us?")
                 .build());
+
+        // other fragment
+        addSlide(new SlideFragmentBuilder()
+                .backgroundColor(R.color.second_slide_background)
+                .buttonsColor(R.color.second_slide_buttons)
+                .title("Want more?")
+                .description("Go on")
+                .build());
     }
 
     @Override

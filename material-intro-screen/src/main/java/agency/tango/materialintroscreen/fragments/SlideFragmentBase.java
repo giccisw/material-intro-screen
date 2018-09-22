@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import agency.tango.materialintroscreen.MaterialIntroActivity;
 import agency.tango.materialintroscreen.R;
 import agency.tango.materialintroscreen.parallax.ParallaxFragment;
 
@@ -29,8 +30,8 @@ public class SlideFragmentBase extends ParallaxFragment {
         return R.color.mis_default_buttons_color;
     }
 
-    public boolean canMoveFurther() {
-        return true;
+    public void setCanMoveFurther(boolean canMoveFurther) {
+        ((MaterialIntroActivity)getActivity()).setCanMoveFurther(this, canMoveFurther);
     }
 
     public String cantMoveFurtherErrorMessage() {

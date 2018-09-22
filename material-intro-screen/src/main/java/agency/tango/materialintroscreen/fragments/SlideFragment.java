@@ -92,11 +92,6 @@ public class SlideFragment extends SlideFragmentBase {
     }
 
     @Override
-    public boolean canMoveFurther() {
-        return true;
-    }
-
-    @Override
     public String cantMoveFurtherErrorMessage() {
         return getString(R.string.mis_impassable_slide);
     }

@@ -19,12 +19,14 @@ public class CustomSlide extends SlideFragmentBase {
             @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_custom_slide, container, false);
         checkBox = (CheckBox) view.findViewById(R.id.checkBox);
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setCanMoveFurther(checkBox.isChecked());
+            }
+        });
+        setCanMoveFurther(checkBox.isChecked());
         return view;
-    }
-
-    @Override
-    public boolean canMoveFurther() {
-        return checkBox.isChecked();
     }
 
     @Override

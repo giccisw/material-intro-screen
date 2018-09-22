@@ -163,7 +163,7 @@ public class InkPageIndicator extends View
     }
 
     private int getCount() {
-        return viewPager.getAdapter().getCount();
+        return viewPager.getAdapter().getTotalCount();
     }
 
     public void setViewPager(final SwipeableViewPager viewPager) {

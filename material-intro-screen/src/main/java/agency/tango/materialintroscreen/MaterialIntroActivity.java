@@ -144,7 +144,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 if (adapter.getItem(position).hasNeededPermissionsToGrant()
-                                        || !adapter.getItem(position).canMoveFurther()) {
+                                        || !adapter.canMoveFurther(position)) {
                                     viewPager.setCurrentItem(position, true);
                                     pageIndicator.clearJoiningFractions();
                                 }
@@ -198,7 +198,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         SlideFragmentBase fragment = adapter.getItem(viewPager.getCurrentItem());
         boolean hasPermissionToGrant = fragment.hasNeededPermissionsToGrant();
         if (!hasPermissionToGrant) {
-            viewPager.setSwipingRightAllowed(true);
+//            viewPager.setSwipingRightAllowed(true);
             nextButtonBehaviour(viewPager.getCurrentItem(), fragment);
             messageButtonBehaviourOnPageSelected.pageSelected(viewPager.getCurrentItem());
         } else {
@@ -222,7 +222,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
                 int position = viewPager.getCurrentItem();
-                if (adapter.isLastSlide(position) && adapter.getItem(position).canMoveFurther()) {
+                if (adapter.isLastSlide(position) && adapter.canMoveFurther(position)) {
                     performFinish();
                 } else if (adapter.shouldLockSlide(position)) {
                     errorOccurred(adapter.getItem(position));
@@ -245,23 +245,26 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
     /**
      * Add SlideFragmentBase to IntroScreen
-     *
      * @param slideFragmentBase Fragment to add
      */
     public void addSlide(SlideFragmentBase slideFragmentBase) {
-        adapter.addItem(slideFragmentBase);
+        adapter.setSlide(slideFragmentBase, true);
     }
 
     /**
      * Add SlideFragment to IntroScreen
-     *
      * @param slideFragmentBase      Fragment to add
      * @param messageButtonBehaviour Add behaviour for message button
      */
     public void addSlide(SlideFragmentBase slideFragmentBase,
             MessageButtonBehaviour messageButtonBehaviour) {
-        adapter.addItem(slideFragmentBase);
+        adapter.setSlide(slideFragmentBase, true);
         messageButtonBehaviours.put(adapter.getLastItemPosition(), messageButtonBehaviour);
+    }
+
+    public void canMoveChange(SlideFragmentBase fragment, boolean canMoveFurther)
+    {
+        adapter.setSlide(fragment, canMoveFurther);
     }
 
     /** Set skip button instead of back button */
@@ -274,7 +277,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
             public void onClick(View v) {
                 for (int position = viewPager.getCurrentItem(); position < adapter.getCount();
                         position++) {
-                    if (!adapter.getItem(position).canMoveFurther()) {
+                    if (!adapter.canMoveFurther(position)) {
                         viewPager.setCurrentItem(position, true);
                         showError(adapter.getItem(position).cantMoveFurtherErrorMessage());
                         return;
@@ -381,7 +384,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
             nextButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (fragment.canMoveFurther()) {
+                    if (adapter.canMoveFurther(position)) {
                         viewPager.moveToNextPage();
                     } else {
                         errorOccurred(fragment);
@@ -443,6 +446,11 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         return getColorFromRes(adapter.getItem(position).backgroundColor());
     }
 
+    public void setCanMoveFurther(SlideFragmentBase fragmentBase, boolean canMoveFurther)
+    {
+        adapter.setSlide(fragmentBase, canMoveFurther);
+    }
+
     private class ColorTransitionScrollListener implements IPageScrolledListener {
 
         @Override
@@ -487,8 +495,9 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            SlideFragmentBase slideFragment = adapter.getItem(adapter.getLastItemPosition());
-            if (!slideFragment.canMoveFurther()) {
+            int n = adapter.getLastItemPosition();
+            SlideFragmentBase slideFragment = adapter.getItem(n);
+            if (!adapter.canMoveFurther(n)) {
                 errorOccurred(slideFragment);
             } else {
                 performFinish();
