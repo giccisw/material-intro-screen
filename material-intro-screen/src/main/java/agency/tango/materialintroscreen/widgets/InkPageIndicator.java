@@ -40,6 +40,7 @@ import android.view.animation.Interpolator;
 import java.util.Arrays;
 
 import agency.tango.materialintroscreen.R;
+import agency.tango.materialintroscreen.adapter.SlidesAdapter;
 
 public class InkPageIndicator extends View
         implements ViewPager.OnPageChangeListener, View.OnAttachStateChangeListener {
@@ -85,7 +86,7 @@ public class InkPageIndicator extends View
     private float dotCenterY;
     private float dotBottomY;
 
-    private SwipeableViewPager viewPager;
+    private ViewPager viewPager;
 
     // state
     private int pageCount;
@@ -163,10 +164,10 @@ public class InkPageIndicator extends View
     }
 
     private int getCount() {
-        return viewPager.getAdapter().getTotalCount();
+        return ((SlidesAdapter)viewPager.getAdapter()).getTotalCount();
     }
 
-    public void setViewPager(final SwipeableViewPager viewPager) {
+    public void setViewPager(final ViewPager viewPager) {
         this.viewPager = viewPager;
         viewPager.addOnPageChangeListener(this);
         setPageCount(getCount());

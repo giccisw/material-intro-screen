@@ -11,8 +11,8 @@
     android:background="@android:color/transparent"
     android:orientation="vertical">
 
-    <agency.tango.materialintroscreen.widgets.OverScrollViewPager
-        android:id="@+id/view_pager_slides"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/mis_swipeable_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

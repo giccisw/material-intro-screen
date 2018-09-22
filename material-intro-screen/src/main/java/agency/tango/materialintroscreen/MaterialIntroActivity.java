@@ -13,6 +13,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
 import android.view.KeyEvent;
@@ -32,7 +33,6 @@ import agency.tango.materialintroscreen.animations.wrappers.SkipButtonTranslatio
 import agency.tango.materialintroscreen.animations.wrappers.ViewPagerTranslationWrapper;
 import agency.tango.materialintroscreen.behaviours.MessageButtonBehaviour;
 import agency.tango.materialintroscreen.fragments.SlideFragmentBase;
-import agency.tango.materialintroscreen.listeners.IFinishListener;
 import agency.tango.materialintroscreen.listeners.IPageScrolledListener;
 import agency.tango.materialintroscreen.listeners.IPageSelectedListener;
 import agency.tango.materialintroscreen.listeners.MessageButtonBehaviourOnPageSelected;
@@ -40,14 +40,12 @@ import agency.tango.materialintroscreen.listeners.ViewBehavioursOnPageChangeList
 import agency.tango.materialintroscreen.listeners.click.PermissionNotGrantedClickListener;
 import agency.tango.materialintroscreen.listeners.scroll.ParallaxScrollListener;
 import agency.tango.materialintroscreen.widgets.InkPageIndicator;
-import agency.tango.materialintroscreen.widgets.OverScrollViewPager;
-import agency.tango.materialintroscreen.widgets.SwipeableViewPager;
 
 @SuppressWarnings("unused")
 public abstract class MaterialIntroActivity extends AppCompatActivity {
 
     // the views
-    private SwipeableViewPager viewPager;
+    private ViewPager viewPager;
     private InkPageIndicator pageIndicator;
     private SlidesAdapter adapter;
     private ImageButton backButton;
@@ -56,7 +54,6 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     private Button messageButton;
     private LinearLayout navigationView;
-    private OverScrollViewPager overScrollLayout;
 
     /** Calculates color tansitions */
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
@@ -91,8 +88,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         setContentView(R.layout.mis_activity_material_intro);
 
         // get views
-        overScrollLayout = findViewById(R.id.view_pager_slides);
-        viewPager = overScrollLayout.getOverScrollView();
+        viewPager = findViewById(R.id.mis_swipeable_view_pager);
         pageIndicator = findViewById(R.id.indicator);
         backButton = findViewById(R.id.button_back);
         nextButton = findViewById(R.id.button_next);
@@ -114,22 +110,22 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
                 messageButton, adapter, messageButtonBehaviours);
 
         // register the finish action for the over scroll layout
-        overScrollLayout.registerFinishListener(new IFinishListener() {
-            @Override
-            public void onFinish() {
-                performFinish();
-            }
-        });
+//        overScrollLayout.registerFinishListener(new IFinishListener() {
+//            @Override
+//            public void onFinish() {
+//                performFinish();
+//            }
+//        });
 
         // configure the view pager
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
-        viewPager.registerSlideErrorHandler(new ISlideErrorHandler() {
-            @Override
-            public void handleError() {
-                errorOccurred(adapter.getItem(viewPager.getCurrentItem()));
-            }
-        });
+//        viewPager.registerSlideErrorHandler(new ISlideErrorHandler() {
+//            @Override
+//            public void handleError() {
+//                errorOccurred(adapter.getItem(viewPager.getCurrentItem()));
+//            }
+//        });
         viewPager.addOnPageChangeListener(new ViewBehavioursOnPageChangeListener(adapter)
                 .registerViewTranslationWrapper(nextButtonTranslationWrapper)
                 .registerViewTranslationWrapper(backButtonTranslationWrapper)
@@ -227,7 +223,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
                 } else if (adapter.shouldLockSlide(position)) {
                     errorOccurred(adapter.getItem(position));
                 } else {
-                    viewPager.moveToNextPage();
+                    viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
                 }
                 break;
             case KeyEvent.KEYCODE_DPAD_LEFT:
@@ -296,7 +292,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewPager.setCurrentItem(viewPager.getPreviousItem(), true);
+                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
             }
         });
     }
@@ -349,14 +345,6 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
     }
 
     /**
-     * Set if last screen should be able to exit with alpha transition
-     * @param enableAlphaExitTransition should enable alpha exit transition
-     */
-    public void enableLastSlideAlphaExitTransition(boolean enableAlphaExitTransition) {
-        viewPager.alphaExitTransitionEnabled(enableAlphaExitTransition);
-    }
-
-    /**
      * Show snackbar message
      * @param message Message which will be visible to user
      */
@@ -385,7 +373,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     if (adapter.canMoveFurther(position)) {
-                        viewPager.moveToNextPage();
+                        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
                     } else {
                         errorOccurred(fragment);
                     }
@@ -403,7 +391,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         if (viewPager.getCurrentItem() == 0) {
             finish();
         } else {
-            viewPager.setCurrentItem(viewPager.getPreviousItem(), true);
+            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
         }
     }
 
