@@ -55,9 +55,10 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
     private Button messageButton;
     private LinearLayout navigationView;
 
-    /** Calculates color tansitions */
+    /** Calculates color transitions */
     private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
 
+    // handlers for views translations
     private ViewTranslationWrapper nextButtonTranslationWrapper;
     private ViewTranslationWrapper backButtonTranslationWrapper;
     private ViewTranslationWrapper pageIndicatorTranslationWrapper;
@@ -100,6 +101,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         // create the adapter for the slides
         adapter = new SlidesAdapter(getSupportFragmentManager());
 
+        // create the default view translation wrappers
         nextButtonTranslationWrapper = new NextButtonTranslationWrapper(nextButton);
         backButtonTranslationWrapper = new BackButtonTranslationWrapper(backButton);
         pageIndicatorTranslationWrapper = new PageIndicatorTranslationWrapper(pageIndicator);
@@ -109,23 +111,9 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         messageButtonBehaviourOnPageSelected = new MessageButtonBehaviourOnPageSelected(
                 messageButton, adapter, messageButtonBehaviours);
 
-        // register the finish action for the over scroll layout
-//        overScrollLayout.registerFinishListener(new IFinishListener() {
-//            @Override
-//            public void onFinish() {
-//                performFinish();
-//            }
-//        });
-
         // configure the view pager
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
-//        viewPager.registerSlideErrorHandler(new ISlideErrorHandler() {
-//            @Override
-//            public void handleError() {
-//                errorOccurred(adapter.getItem(viewPager.getCurrentItem()));
-//            }
-//        });
         viewPager.addOnPageChangeListener(new ViewBehavioursOnPageChangeListener(adapter)
                 .registerViewTranslationWrapper(nextButtonTranslationWrapper)
                 .registerViewTranslationWrapper(backButtonTranslationWrapper)
@@ -187,11 +175,19 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Returns the current slide
+     * @return The current slide
+     */
+    protected SlideFragmentBase getCurrentSlide() {
+        return adapter.getItem(viewPager.getCurrentItem());
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
             @NonNull int[] grantResults)
     {
-        SlideFragmentBase fragment = adapter.getItem(viewPager.getCurrentItem());
+        SlideFragmentBase fragment = getCurrentSlide();
         boolean hasPermissionToGrant = fragment.hasNeededPermissionsToGrant();
         if (!hasPermissionToGrant) {
 //            viewPager.setSwipingRightAllowed(true);
@@ -275,7 +271,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
                         position++) {
                     if (!adapter.canMoveFurther(position)) {
                         viewPager.setCurrentItem(position, true);
-                        showError(adapter.getItem(position).cantMoveFurtherErrorMessage());
+                        showError(getString(adapter.getItem(position).cantMoveFurtherErrorString()));
                         return;
                     }
                 }
@@ -397,12 +393,12 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
     private void errorOccurred(SlideFragmentBase slideFragmentBase) {
         nextButtonTranslationWrapper.error();
-        showError(slideFragmentBase.cantMoveFurtherErrorMessage());
+        showError(getString(slideFragmentBase.cantMoveFurtherErrorString()));
     }
 
     private void showError(String error) {
         Snackbar.make(coordinatorLayout, error, Snackbar.LENGTH_SHORT)
-                .setCallback(new Snackbar.Callback() {
+                .addCallback(new Snackbar.Callback() {
                     @Override
                     public void onDismissed(Snackbar snackbar, int event) {
                         navigationView.setTranslationY(0f);

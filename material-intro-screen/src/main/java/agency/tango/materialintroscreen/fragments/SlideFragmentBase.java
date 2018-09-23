@@ -1,9 +1,11 @@
 package agency.tango.materialintroscreen.fragments;
 
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -20,22 +22,43 @@ public class SlideFragmentBase extends ParallaxFragment {
 
     private static final int PERMISSIONS_REQUEST_CODE = 15621;
 
+    /** Colors for background and buttons */
+    @ColorRes protected int backgroundColor = R.color.mis_default_background_color,
+                  buttonsColor = R.color.mis_default_buttons_color;
+
+    /** Message which shall be used for impassable slide */
+    @StringRes protected int cantMoveFurtherErrorString = R.string.mis_impassable_slide;
+
     @ColorRes
     public int backgroundColor() {
-        return R.color.mis_default_background_color;
+        return backgroundColor;
     }
 
     @ColorRes
     public int buttonsColor() {
-        return R.color.mis_default_buttons_color;
+        return buttonsColor;
+    }
+
+    @StringRes
+    public int cantMoveFurtherErrorString() {
+        return cantMoveFurtherErrorString;
     }
 
     public void setCanMoveFurther(boolean canMoveFurther) {
         ((MaterialIntroActivity)getActivity()).setCanMoveFurther(this, canMoveFurther);
     }
 
-    public String cantMoveFurtherErrorMessage() {
-        return getString(R.string.mis_impassable_slide);
+    public void showError(String error) {
+        final Activity activity = getActivity();
+        assert activity != null;
+        Snackbar.make(activity.findViewById(R.id.coordinator_layout_slide), error, Snackbar.LENGTH_SHORT)
+                .addCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar snackbar, int event) {
+                        activity.findViewById(R.id.navigation_view).setTranslationY(0f);
+                        super.onDismissed(snackbar, event);
+                    }
+                }).show();
     }
 
     public String[] possiblePermissions() {

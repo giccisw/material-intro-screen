@@ -1,8 +1,6 @@
 package agency.tango.materialintroscreen.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -27,29 +25,14 @@ public class SlideFragment extends SlideFragmentBase {
     public static final String GRANT_PERMISSION_MESSAGE = "grant_permission_message";
     public static final String GRANT_PERMISSION_ERROR = "grant_permission_error";
 
-    @ColorRes
-    private int backgroundColor;
-
-    @ColorRes
-    private int buttonsColor;
-
-    @DrawableRes
-    private int image;
-
     @StringRes
     private int grantPermissionStringRes;
 
     @StringRes
     private int grantPermissionErrorStringRes;
 
-    private String title;
-    private String description;
     private String[] neededPermissions;
     private String[] possiblePermissions;
-
-    private TextView titleTextView;
-    private TextView descriptionTextView;
-    private ImageView imageView;
 
     public static SlideFragment createInstance(Bundle bundle) {
         SlideFragment slideFragment = new SlideFragment();
@@ -61,24 +44,39 @@ public class SlideFragment extends SlideFragmentBase {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.mis_fragment_slide, container, false);
-        titleTextView = view.findViewById(R.id.txt_title_slide);
-        descriptionTextView = view.findViewById(R.id.txt_description_slide);
-        imageView = view.findViewById(R.id.image_slide);
-        initializeView();
+        TextView titleTextView = view.findViewById(R.id.txt_title_slide);
+        TextView descriptionTextView = view.findViewById(R.id.txt_description_slide);
+        ImageView imageView = view.findViewById(R.id.image_slide);
+
+        Bundle bundle = getArguments();
+        assert bundle != null;
+        backgroundColor = bundle.getInt(BACKGROUND_COLOR);
+        buttonsColor = bundle.getInt(BUTTONS_COLOR);
+        int image = bundle.getInt(IMAGE, 0);
+        String title = bundle.getString(TITLE);
+        String description = bundle.getString(DESCRIPTION);
+        neededPermissions = bundle.getStringArray(NEEDED_PERMISSIONS);
+        possiblePermissions = bundle.getStringArray(POSSIBLE_PERMISSIONS);
+        grantPermissionStringRes = bundle.getInt(GRANT_PERMISSION_MESSAGE);
+        grantPermissionErrorStringRes = bundle.getInt(GRANT_PERMISSION_ERROR);
+
+        titleTextView.setText(title);
+        descriptionTextView.setText(description);
+
+        if (image != 0) {
+            imageView.setImageDrawable(ContextCompat.getDrawable(getActivity(), image));
+            imageView.setVisibility(View.VISIBLE);
+        }
+
+        if (grantPermissionStringRes == 0)
+            grantPermissionStringRes = R.string.mis_grant_permissions;
+
+        if (grantPermissionErrorStringRes == 0)
+            grantPermissionErrorStringRes = R.string.mis_please_grant_permissions;
+
         return view;
-    }
-
-    @Override
-    @ColorRes
-    public int backgroundColor() {
-        return backgroundColor;
-    }
-
-    @Override
-    @ColorRes
-    public int buttonsColor() {
-        return buttonsColor;
     }
 
     @Override
@@ -92,11 +90,6 @@ public class SlideFragment extends SlideFragmentBase {
     }
 
     @Override
-    public String cantMoveFurtherErrorMessage() {
-        return getString(R.string.mis_impassable_slide);
-    }
-
-    @Override
     public int grantPermissionStringRes() {
         return grantPermissionStringRes;
     }
@@ -104,39 +97,5 @@ public class SlideFragment extends SlideFragmentBase {
     @Override
     public int grantPermissionErrorStringRes() {
         return grantPermissionErrorStringRes;
-    }
-
-    private void initializeView() {
-        Bundle bundle = getArguments();
-        assert bundle != null;
-        backgroundColor = bundle.getInt(BACKGROUND_COLOR);
-        buttonsColor = bundle.getInt(BUTTONS_COLOR);
-        image = bundle.getInt(IMAGE, 0);
-        title = bundle.getString(TITLE);
-        description = bundle.getString(DESCRIPTION);
-        neededPermissions = bundle.getStringArray(NEEDED_PERMISSIONS);
-        possiblePermissions = bundle.getStringArray(POSSIBLE_PERMISSIONS);
-        grantPermissionStringRes = bundle.getInt(GRANT_PERMISSION_MESSAGE);
-        grantPermissionErrorStringRes = bundle.getInt(GRANT_PERMISSION_ERROR);
-
-        updateViewWithValues();
-    }
-
-    private void updateViewWithValues() {
-        titleTextView.setText(title);
-        descriptionTextView.setText(description);
-
-        if (image != 0) {
-            imageView.setImageDrawable(ContextCompat.getDrawable(getActivity(), image));
-            imageView.setVisibility(View.VISIBLE);
-        }
-
-        if (grantPermissionStringRes == 0) {
-            grantPermissionStringRes = R.string.mis_grant_permissions;
-        }
-
-        if (grantPermissionErrorStringRes == 0) {
-            grantPermissionErrorStringRes = R.string.mis_please_grant_permissions;
-        }
     }
 }

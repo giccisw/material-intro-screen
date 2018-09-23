@@ -26,11 +26,7 @@ public class CustomSlide extends SlideFragmentBase {
             }
         });
         setCanMoveFurther(checkBox.isChecked());
+        cantMoveFurtherErrorString = R.string.error_message;
         return view;
-    }
-
-    @Override
-    public String cantMoveFurtherErrorMessage() {
-        return getString(R.string.error_message);
     }
 }

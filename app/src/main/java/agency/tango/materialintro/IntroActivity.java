@@ -8,8 +8,8 @@ import android.widget.Toast;
 
 import agency.tango.materialintroscreen.MaterialIntroActivity;
 import agency.tango.materialintroscreen.behaviours.MessageButtonBehaviour;
+import agency.tango.materialintroscreen.behaviours.MessageButtonBehaviourPermission;
 import agency.tango.materialintroscreen.fragments.SlideFragmentBuilder;
-import agency.tango.materialintroscreen.listeners.click.MessageButtonClickListener;
 
 public class IntroActivity extends MaterialIntroActivity {
 
@@ -34,13 +34,14 @@ public class IntroActivity extends MaterialIntroActivity {
                         .title("Organize your time with us")
                         .description("Would you try?")
                         .build(),
-                new MessageButtonBehaviour(new MessageButtonClickListener() {
+                new MessageButtonBehaviour("Work with love",
+                        new MessageButtonBehaviour.MessageButtonClickListener() {
                     @Override
                     public void onClick(Button messageButton) {
                         messageButton.setText("Click me once again!");
                         showMessage("We provide solutions to make you love your work");
                     }
-                }, "Work with love"));
+                }));
 
         addSlide(new SlideFragmentBuilder()
                 .backgroundColor(R.color.second_slide_background)
@@ -65,12 +66,11 @@ public class IntroActivity extends MaterialIntroActivity {
                         .title("We provide best tools")
                         .description("ever")
                         .build(),
-                new MessageButtonBehaviour(new MessageButtonClickListener() {
-                    @Override
-                    public void onClick(Button messageButton) {
-                        showMessage("Try us!");
-                    }
-                }, "Tools"));
+                new MessageButtonBehaviourPermission(this, "Tools",
+                        new String[]{Manifest.permission.CAMERA,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION},
+                        new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_SMS}));
 
         addSlide(new SlideFragmentBuilder()
                 .backgroundColor(R.color.fourth_slide_background)

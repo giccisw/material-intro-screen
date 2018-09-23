@@ -41,7 +41,7 @@ public class MessageButtonBehaviourOnPageSelected implements IPageSelectedListen
             });
         } else if (checkIfMessageButtonHasBehaviour(position)) {
             showMessageButton(slideFragment);
-            messageButton.setText(messageButtonBehaviours.get(position).getMessageButtonText());
+            messageButton.setText(messageButtonBehaviours.get(position).getMessageButtonText(slideFragment));
             messageButton
                     .setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -58,7 +58,7 @@ public class MessageButtonBehaviourOnPageSelected implements IPageSelectedListen
 
     private boolean checkIfMessageButtonHasBehaviour(int position) {
         return messageButtonBehaviours.get(position) != null && !TextUtils.isEmpty(
-                messageButtonBehaviours.get(position).getMessageButtonText());
+                messageButtonBehaviours.get(position).getMessageButtonText(adapter.getItem(position)));
     }
 
     private void showMessageButton(final SlideFragmentBase fragment) {
