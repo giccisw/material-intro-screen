@@ -34,7 +34,6 @@ import agency.tango.materialintroscreen.animations.wrappers.ViewPagerTranslation
 import agency.tango.materialintroscreen.behaviours.MessageButtonBehaviour;
 import agency.tango.materialintroscreen.fragments.SlideFragmentBase;
 import agency.tango.materialintroscreen.listeners.IPageScrolledListener;
-import agency.tango.materialintroscreen.listeners.IPageSelectedListener;
 import agency.tango.materialintroscreen.listeners.MessageButtonBehaviourOnPageSelected;
 import agency.tango.materialintroscreen.listeners.ViewBehavioursOnPageChangeListener;
 import agency.tango.materialintroscreen.listeners.click.PermissionNotGrantedClickListener;
@@ -121,35 +120,36 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
                 .registerViewTranslationWrapper(viewPagerTranslationWrapper)
                 .registerViewTranslationWrapper(skipButtonTranslationWrapper)
 
-                .registerOnPageScrolled(new IPageScrolledListener() {
-                    @Override
-                    public void pageScrolled(final int position, float offset) {
-                        viewPager.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (adapter.getItem(position).hasNeededPermissionsToGrant()
-                                        || !adapter.canMoveFurther(position)) {
-                                    viewPager.setCurrentItem(position, true);
-                                    pageIndicator.clearJoiningFractions();
-                                }
-                            }
-                        });
-                    }
-                })
+//                .registerOnPageScrolled(new IPageScrolledListener() {
+//                    @Override
+//                    public void pageScrolled(final int position, float offset) {
+//                        viewPager.post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                if (adapter.getItem(position).hasNeededPermissionsToGrant()
+//                                        || !adapter.canMoveFurther(position)) {
+//                                    viewPager.setCurrentItem(position, true);
+//                                    pageIndicator.clearJoiningFractions();
+//                                }
+//                            }
+//                        });
+//                    }
+//                })
                 .registerOnPageScrolled(new ColorTransitionScrollListener())
                 .registerOnPageScrolled(new ParallaxScrollListener(adapter))
 
                 .registerPageSelectedListener(messageButtonBehaviourOnPageSelected)
-                .registerPageSelectedListener(new IPageSelectedListener() {
-                    @Override
-                    public void pageSelected(int position) {
-                        nextButtonBehaviour(position, adapter.getItem(position));
-
-                        if (adapter.shouldFinish(position)) {
-                            performFinish();
-                        }
-                    }
-                }));
+//                .registerPageSelectedListener(new IPageSelectedListener() {
+//                    @Override
+//                    public void pageSelected(int position) {
+//                        nextButtonBehaviour(position, adapter.getItem(position));
+//
+//                        if (adapter.shouldFinish(position)) {
+//                            performFinish();
+//                        }
+//                    }
+//                })
+        );
 
         // attach the page indicator to the view pager
         pageIndicator.setViewPager(viewPager);
@@ -160,19 +160,19 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
         // show back button by default
         setBackButtonVisible();
+    }
 
-        viewPager.post(new Runnable() {
-            @Override
-            public void run() {
-                if (adapter.getCount() == 0) {
-                    finish();
-                } else {
-                    int currentItem = viewPager.getCurrentItem();
-                    messageButtonBehaviourOnPageSelected.pageSelected(currentItem);
-                    nextButtonBehaviour(currentItem, adapter.getItem(currentItem));
-                }
-            }
-        });
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        if (adapter.getCount() == 0) {
+            finish();
+        } else {
+            int currentItem = viewPager.getCurrentItem();
+            messageButtonBehaviourOnPageSelected.pageSelected(currentItem);
+            nextButtonBehaviour(currentItem, adapter.getItem(currentItem));
+        }
     }
 
     /**
@@ -202,6 +202,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        // if back key has been pressed, move to previous slide if any
         moveBack();
     }
 
@@ -213,14 +214,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
                     messageButton.performClick();
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                int position = viewPager.getCurrentItem();
-                if (adapter.isLastSlide(position) && adapter.canMoveFurther(position)) {
-                    performFinish();
-                } else if (adapter.shouldLockSlide(position)) {
-                    errorOccurred(adapter.getItem(position));
-                } else {
-                    viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-                }
+                moveForward();
                 break;
             case KeyEvent.KEYCODE_DPAD_LEFT:
                 moveBack();
@@ -383,12 +377,20 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         finish();
     }
 
-    private void moveBack() {
-        if (viewPager.getCurrentItem() == 0) {
-            finish();
-        } else {
-            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
-        }
+    /** Move to previous slide */
+    protected void moveBack()
+    {
+        if (viewPager.getCurrentItem() == 0) finish();
+        else viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
+    }
+
+    /** Move to next slide */
+    protected void moveForward()
+    {
+        int position = viewPager.getCurrentItem();
+        if (!adapter.canMoveFurther(position)) errorOccurred(adapter.getItem(position));
+        else if (position == adapter.getTotalCount() - 1) performFinish();
+        else viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
     }
 
     private void errorOccurred(SlideFragmentBase slideFragmentBase) {

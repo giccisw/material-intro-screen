@@ -1,6 +1,7 @@
 package agency.tango.materialintro;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import agency.tango.materialintroscreen.fragments.SlideFragmentBase;
 
 public class CustomSlide extends SlideFragmentBase {
 
+    private boolean accepted;
     private CheckBox checkBox;
 
     @Nullable
@@ -22,11 +24,19 @@ public class CustomSlide extends SlideFragmentBase {
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setCanMoveFurther(checkBox.isChecked());
+                accepted = checkBox.isChecked();
+                setCanMoveFurther(accepted);
             }
         });
-        setCanMoveFurther(checkBox.isChecked());
+        if (savedInstanceState != null) accepted = savedInstanceState.getBoolean("checkbox");
+        setCanMoveFurther(accepted);
         cantMoveFurtherErrorString = R.string.error_message;
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("checkbox", accepted);
     }
 }
