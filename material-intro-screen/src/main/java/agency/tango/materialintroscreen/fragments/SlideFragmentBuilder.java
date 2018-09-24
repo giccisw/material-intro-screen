@@ -11,8 +11,8 @@ import static agency.tango.materialintroscreen.fragments.SlideFragment.DESCRIPTI
 import static agency.tango.materialintroscreen.fragments.SlideFragment.GRANT_PERMISSION_ERROR;
 import static agency.tango.materialintroscreen.fragments.SlideFragment.GRANT_PERMISSION_MESSAGE;
 import static agency.tango.materialintroscreen.fragments.SlideFragment.IMAGE;
-import static agency.tango.materialintroscreen.fragments.SlideFragment.NEEDED_PERMISSIONS;
-import static agency.tango.materialintroscreen.fragments.SlideFragment.POSSIBLE_PERMISSIONS;
+import static agency.tango.materialintroscreen.fragments.SlideFragment.MANDATORY_PERMISSIONS;
+import static agency.tango.materialintroscreen.fragments.SlideFragment.OPTIONAL_PERMISSIONS;
 import static agency.tango.materialintroscreen.fragments.SlideFragment.TITLE;
 
 @SuppressWarnings("unused")
@@ -35,8 +35,8 @@ public class SlideFragmentBuilder {
 
     private String title;
     private String description;
-    private String[] neededPermissions;
-    private String[] possiblePermissions;
+    private String[] mandatoryPermissions;
+    private String[] optionalPermissions;
 
     public SlideFragmentBuilder backgroundColor(@ColorRes int backgroundColor) {
         this.backgroundColor = backgroundColor;
@@ -58,13 +58,13 @@ public class SlideFragmentBuilder {
         return this;
     }
 
-    public SlideFragmentBuilder neededPermissions(String[] neededPermissions) {
-        this.neededPermissions = neededPermissions;
+    public SlideFragmentBuilder mandatoryPermissions(String[] mandatoryPermissions) {
+        this.mandatoryPermissions = mandatoryPermissions;
         return this;
     }
 
-    public SlideFragmentBuilder possiblePermissions(String[] possiblePermissions) {
-        this.possiblePermissions = possiblePermissions;
+    public SlideFragmentBuilder optionalPermissions(String[] optionalPermissions) {
+        this.optionalPermissions = optionalPermissions;
         return this;
     }
 
@@ -98,15 +98,15 @@ public class SlideFragmentBuilder {
         }
 
         Bundle bundle = new Bundle();
-        bundle.putInt(BACKGROUND_COLOR, backgroundColor);
-        bundle.putInt(BUTTONS_COLOR, buttonsColor);
+        if (backgroundColor != 0) bundle.putInt(BACKGROUND_COLOR, backgroundColor);
+        if (buttonsColor != 0) bundle.putInt(BUTTONS_COLOR, buttonsColor);
         bundle.putInt(IMAGE, image);
         bundle.putString(TITLE, title);
         bundle.putString(DESCRIPTION, description);
-        bundle.putStringArray(NEEDED_PERMISSIONS, neededPermissions);
-        bundle.putStringArray(POSSIBLE_PERMISSIONS, possiblePermissions);
-        bundle.putInt(GRANT_PERMISSION_MESSAGE, grantPermissionMessage);
-        bundle.putInt(GRANT_PERMISSION_ERROR, grantPermissionError);
+        if (mandatoryPermissions != null) bundle.putStringArray(MANDATORY_PERMISSIONS, mandatoryPermissions);
+        if (optionalPermissions != null) bundle.putStringArray(OPTIONAL_PERMISSIONS, optionalPermissions);
+        if (grantPermissionMessage != 0) bundle.putInt(GRANT_PERMISSION_MESSAGE, grantPermissionMessage);
+        if (grantPermissionError != 0) bundle.putInt(GRANT_PERMISSION_ERROR, grantPermissionError);
 
         return SlideFragment.createInstance(bundle);
     }
