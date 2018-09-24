@@ -81,13 +81,13 @@ public class SlidesAdapter extends FragmentPagerAdapter {
         return position == getCount() - 1;
     }
 
-    public boolean shouldFinish(int position) {
-        return position == getCount() && canPass.get(getCount() - 1);
-    }
-
-    public boolean shouldLockSlide(int position) {
-        SlideFragmentBase fragment = getItem(position);
-        return !canPass.get(position) || fragment.hasNeededPermissionsToGrant();
-    }
+//    public boolean shouldFinish(int position) {
+//        return position == getCount() && canPass.get(getCount() - 1);
+//    }
+//
+//    public boolean shouldLockSlide(int position) {
+//        SlideFragmentBase fragment = getItem(position);
+//        return !canPass.get(position) || fragment.hasNeededPermissionsToGrant();
+//    }
 
 }

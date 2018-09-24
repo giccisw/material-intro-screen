@@ -3,12 +3,9 @@ package agency.tango.materialintro;
 import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.widget.Button;
 import android.widget.Toast;
 
 import agency.tango.materialintroscreen.MaterialIntroActivity;
-import agency.tango.materialintroscreen.behaviours.MessageButtonBehaviour;
-import agency.tango.materialintroscreen.behaviours.MessageButtonBehaviourPermission;
 import agency.tango.materialintroscreen.fragments.SlideFragmentBuilder;
 
 public class IntroActivity extends MaterialIntroActivity {
@@ -33,15 +30,16 @@ public class IntroActivity extends MaterialIntroActivity {
                         .image(R.drawable.img_office)
                         .title("Organize your time with us")
                         .description("Would you try?")
-                        .build(),
-                new MessageButtonBehaviour("Work with love",
-                        new MessageButtonBehaviour.MessageButtonClickListener() {
-                    @Override
-                    public void onClick(Button messageButton) {
-                        messageButton.setText("Click me once again!");
-                        showMessage("We provide solutions to make you love your work");
-                    }
-                }));
+                        .build()
+//                new MessageButtonBehaviour("Work with love",
+//                        new MessageButtonBehaviour.MessageButtonClickListener() {
+//                    @Override
+//                    public void onClick(Button messageButton) {
+//                        messageButton.setText("Click me once again!");
+//                        showMessage("We provide solutions to make you love your work");
+//                    }
+//                })
+        );
 
         addSlide(new SlideFragmentBuilder()
                 .backgroundColor(R.color.second_slide_background)
@@ -65,12 +63,7 @@ public class IntroActivity extends MaterialIntroActivity {
                         .grantPermissionError(R.string.txt_grant_permission_error)
                         .title("We provide best tools")
                         .description("ever")
-                        .build(),
-                new MessageButtonBehaviourPermission(this, "Tools",
-                        new String[]{Manifest.permission.CAMERA,
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION},
-                        new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_SMS}));
+                        .build());
 
         addSlide(new SlideFragmentBuilder()
                 .backgroundColor(R.color.fourth_slide_background)

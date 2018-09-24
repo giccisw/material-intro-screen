@@ -31,6 +31,7 @@ public class SlideFragment extends SlideFragmentBase {
         return slideFragment;
     }
 
+    /** The message button */
     protected Button messageButton;
 
     @Override
@@ -59,20 +60,36 @@ public class SlideFragment extends SlideFragmentBase {
         descriptionTextView.setText(description);
 
         if (image != 0) {
-            imageView.setImageDrawable(ContextCompat.getDrawable(getActivity(), image));
+            imageView.setImageDrawable(ContextCompat.getDrawable(getContext(), image));
             imageView.setVisibility(View.VISIBLE);
         }
+
+        messageButton.setTextColor(ContextCompat.getColor(getContext(), backgroundColor));
+
+        fixForPermissions();
 
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onDPadCenter() {
+        messageButton.performClick();
+    }
 
-        boolean hasNeededPermissionsToGrant = hasNeededPermissionsToGrant();
-        setCanMoveFurther(hasNeededPermissionsToGrant);
-        messageButton.setText(0);
-        messageButton.setVisibility(hasNeededPermissionsToGrant ? View.VISIBLE : View.INVISIBLE);
+    @Override
+    protected boolean fixForPermissions()
+    {
+        // show the button if there are any permission which shall be granted
+        boolean hasAnyPermissionToGrant = hasAnyPermissionsToGrant();
+        messageButton.setText(grantPermissionStringRes);
+        messageButton.setVisibility(hasAnyPermissionToGrant ? View.VISIBLE : View.INVISIBLE);
+        messageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                askForPermissions();
+            }
+        });
+
+        return super.fixForPermissions();
     }
 }

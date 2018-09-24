@@ -3,9 +3,8 @@ package agency.tango.materialintroscreen.fragments;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.ColorRes;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -20,6 +19,7 @@ import agency.tango.materialintroscreen.parallax.ParallaxFragment;
 
 public class SlideFragmentBase extends ParallaxFragment {
 
+    /** Request code which shall be used for permission requests */
     private static final int PERMISSIONS_REQUEST_CODE = 15621;
 
     /** Colors for background and buttons */
@@ -63,16 +63,42 @@ public class SlideFragmentBase extends ParallaxFragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setCanMoveFurther(!hasNeededPermissionsToGrant());
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults)
+    {
+        if (requestCode == PERMISSIONS_REQUEST_CODE) {
+            boolean hasNeededPermissionsToGrant = fixForPermissions();
+            if (hasNeededPermissionsToGrant) showError(getString(grantPermissionErrorStringRes));
+        }
+        else super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public void setCanMoveFurther(boolean canMoveFurther) {
+    /** Called when the DPAD_CENTER key is pressed */
+    public void onDPadCenter() {}
+
+    /**
+     * Changes the slide behaviour depending on the permission state
+     * @return true if there are needed permissions to be granted
+     */
+    protected boolean fixForPermissions() {
+        boolean hasNeededPermissionsToGrant = hasNeededPermissionsToGrant();
+        setCanMoveFurther(!hasNeededPermissionsToGrant);
+        return hasNeededPermissionsToGrant;
+    }
+
+    /**
+     * Changes the possibility to pass over this slide
+     * @param canMoveFurther If true the user can pass over this slide
+     */
+    protected void setCanMoveFurther(boolean canMoveFurther) {
         ((MaterialIntroActivity)getActivity()).setCanMoveFurther(this, canMoveFurther);
     }
 
-    public void showError(String error) {
+    /**
+     * Shows a snackbar with the specified error string
+     * @param error The error string which shall be shown
+     */
+    protected void showError(String error) {
         final Activity activity = getActivity();
         assert activity != null;
         Snackbar.make(activity.findViewById(R.id.coordinator_layout_slide), error, Snackbar.LENGTH_SHORT)
@@ -85,6 +111,10 @@ public class SlideFragmentBase extends ParallaxFragment {
                 }).show();
     }
 
+    /**
+     * Checks if there are any permission to be granted
+     * @return True if there is at least a permission which shall be granted
+     */
     protected boolean hasAnyPermissionsToGrant()
     {
         boolean hasPermissionToGrant = hasPermissionsToGrant(mandatoryPermissions);
@@ -92,10 +122,15 @@ public class SlideFragmentBase extends ParallaxFragment {
         return hasPermissionToGrant;
     }
 
+    /**
+     * Checks if there are any mandatory permission to be granted
+     * @return True if there is at least a mandatory permission which shall be granted
+     */
     protected boolean hasNeededPermissionsToGrant() {
         return hasPermissionsToGrant(mandatoryPermissions);
     }
 
+    /** Starts the permissions ask process */
     protected void askForPermissions()
     {
         // build the list of permissions not yet granted
@@ -117,9 +152,15 @@ public class SlideFragmentBase extends ParallaxFragment {
                 PERMISSIONS_REQUEST_CODE);
     }
 
+    /**
+     * Checks if the passed permissions are available or not
+     * @param permissions The permissions which shall be checked
+     * @return true if at least one of the passed permission is not granted
+     */
     private boolean hasPermissionsToGrant(String[] permissions)
     {
-        if (isAndroidVersionNotSupportingPermissions()) return false;
+        // permission requests was introduced in Android M
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
 
         if (permissions != null)
             for (String permission : permissions)
@@ -128,9 +169,5 @@ public class SlideFragmentBase extends ParallaxFragment {
                         return true;
 
         return false;
-    }
-
-    private boolean isAndroidVersionNotSupportingPermissions() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M;
     }
 }
