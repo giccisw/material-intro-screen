@@ -2,11 +2,11 @@ package agency.tango.materialintro;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import agency.tango.materialintroscreen.MaterialIntroActivity;
 import agency.tango.materialintroscreen.fragments.SlideFragmentBuilder;
+import androidx.annotation.Nullable;
 
 public class IntroActivity extends MaterialIntroActivity {
 

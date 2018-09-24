@@ -3,13 +3,13 @@ package agency.tango.materialintroscreen.parallax;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.annotation.FloatRange;
-import android.support.percent.PercentRelativeLayout;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
 import agency.tango.materialintroscreen.R;
+import androidx.annotation.FloatRange;
+import androidx.percentlayout.widget.PercentRelativeLayout;
 
 public class ParallaxPercentRelativeLayout extends PercentRelativeLayout implements Parallaxable {
 

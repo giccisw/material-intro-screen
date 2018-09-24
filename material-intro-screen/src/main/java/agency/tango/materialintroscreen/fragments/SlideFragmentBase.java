@@ -3,19 +3,20 @@ package agency.tango.materialintroscreen.fragments;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
 import agency.tango.materialintroscreen.MaterialIntroActivity;
 import agency.tango.materialintroscreen.R;
 import agency.tango.materialintroscreen.parallax.ParallaxFragment;
+import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class SlideFragmentBase extends ParallaxFragment {
 
@@ -23,11 +24,13 @@ public class SlideFragmentBase extends ParallaxFragment {
     private static final int PERMISSIONS_REQUEST_CODE = 15621;
 
     /** Colors for background and buttons */
-    @ColorRes protected int backgroundColor = R.color.mis_default_background_color,
+    @ColorRes
+    protected int backgroundColor = R.color.mis_default_background_color,
                   buttonsColor = R.color.mis_default_buttons_color;
 
     /** Message which shall be used for impassable slide */
-    @StringRes protected int cantMoveFurtherErrorString = R.string.mis_impassable_slide;
+    @StringRes
+    protected int cantMoveFurtherErrorString = R.string.mis_impassable_slide;
 
     /** Requested permissions */
     protected String[] mandatoryPermissions, optionalPermissions;

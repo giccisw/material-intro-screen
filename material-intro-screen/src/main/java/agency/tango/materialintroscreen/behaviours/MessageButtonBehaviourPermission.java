@@ -2,8 +2,6 @@ package agency.tango.materialintroscreen.behaviours;
 
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Button;
 
@@ -13,6 +11,8 @@ import java.util.List;
 
 import agency.tango.materialintroscreen.MaterialIntroActivity;
 import agency.tango.materialintroscreen.fragments.SlideFragmentBase;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 /** Handler for the message button handling permissions */
 public class MessageButtonBehaviourPermission extends MessageButtonBehaviour {

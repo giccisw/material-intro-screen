@@ -1,12 +1,11 @@
 package agency.tango.materialintroscreen.listeners;
 
-import android.support.v4.view.ViewPager;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import agency.tango.materialintroscreen.adapter.SlidesAdapter;
 import agency.tango.materialintroscreen.animations.ViewTranslationWrapper;
+import androidx.viewpager.widget.ViewPager;
 
 public class ViewBehavioursOnPageChangeListener implements ViewPager.OnPageChangeListener {
 

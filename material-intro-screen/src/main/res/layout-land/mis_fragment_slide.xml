@@ -49,5 +49,14 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             tools:text="Lorem ipsum dolor sit amet, consectetur, adipisci velit, …" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/mis_button_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:theme="@style/Widget.ColoredButton"
+            android:visibility="invisible"
+            tools:text="Message btn" />
+
     </LinearLayout>
 </agency.tango.materialintroscreen.parallax.ParallaxLinearLayout>

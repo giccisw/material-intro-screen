@@ -1,9 +1,9 @@
 package agency.tango.materialintroscreen.animations.translations;
 
-import android.support.annotation.FloatRange;
 import android.view.View;
 
 import agency.tango.materialintroscreen.animations.IViewTranslation;
+import androidx.annotation.FloatRange;
 
 public class AlphaTranslation implements IViewTranslation {
     @Override

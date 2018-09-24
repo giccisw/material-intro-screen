@@ -48,7 +48,7 @@
         app:mis_layout_parallaxFactor="0.2"
         tools:text="Lorem ipsum dolor sit amet, consectetur, adipisci velit, …" />
 
-    <android.support.v7.widget.AppCompatButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/mis_button_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

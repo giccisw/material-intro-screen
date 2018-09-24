@@ -1,12 +1,11 @@
 package agency.tango.materialintroscreen.adapter;
 
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import agency.tango.materialintroscreen.fragments.SlideFragmentBase;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 
 /** Stores the fragments for the slides, organized in sections */
 public class SlidesAdapter extends FragmentPagerAdapter {
