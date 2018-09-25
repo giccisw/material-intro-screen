@@ -23,16 +23,7 @@
         android:layout_gravity="bottom"
         android:orientation="vertical"
         android:paddingTop="32dp"
-        app:layout_behavior="agency.tango.materialintroscreen.behaviours.MoveUpBehaviour">
-
-        <!--<android.support.v7.widget.AppCompatButton-->
-            <!--android:id="@+id/button_message"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal|bottom"-->
-            <!--android:theme="@style/Widget.ColoredButton"-->
-            <!--android:visibility="invisible"-->
-            <!--tools:text="Message btn" />-->
+        app:layout_behavior="it.giccisw.util.introscreen.behaviours.MoveUpBehaviour">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,7 +53,7 @@
                 android:src="@drawable/mis_ic_skip"
                 android:visibility="gone" />
 
-            <agency.tango.materialintroscreen.widgets.InkPageIndicator
+            <it.giccisw.util.introscreen.widgets.InkPageIndicator
                 android:id="@+id/indicator"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

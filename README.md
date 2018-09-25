@@ -46,7 +46,7 @@ public class IntroActivity extends MaterialIntroActivity
                 .buttonsColor(R.color.colorAccent)
                 .possiblePermissions(new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_SMS})
                 .neededPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
-                .image(agency.tango.materialintroscreen.R.drawable.ic_next)
+                .image(introscreen.R.drawable.ic_next)
                 .grantPermissionMessage(R.string.txt_pls_grant_permission)
                 .grantPermissionError(R.string.txt_grant_permission_error)
                 .title("title 3")
@@ -110,7 +110,7 @@ getBackButtonTranslationWrapper()
 
 #### And set there the [app:mis_layout_parallaxFactor][ParallaxFactor] attribute:
 ```xml
-<agency.tango.materialintroscreen.parallax.ParallaxLinearLayout
+<introscreen.parallax.ParallaxLinearLayout
 xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ImageView

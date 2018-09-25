@@ -6,7 +6,7 @@ android {
     compileSdkVersion project.compileSdkVersion
     buildToolsVersion project.buildToolsVersion
     defaultConfig {
-        applicationId "agency.tango.materialintro"
+        applicationId "it.giccisw.demo.introscreen"
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
         versionCode 1

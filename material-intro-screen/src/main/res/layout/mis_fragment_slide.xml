@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<agency.tango.materialintroscreen.parallax.ParallaxLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mis_slide_background"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    android:layout_marginTop="16dp"
-    android:background="@android:color/transparent"
-    android:clipToPadding="false"
-    android:fitsSystemWindows="false"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:paddingBottom="164dp">
+<it.giccisw.util.introscreen.parallax.ParallaxLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                           xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                           xmlns:tools="http://schemas.android.com/tools"
+                                                           android:id="@+id/mis_slide_background"
+                                                           android:layout_width="match_parent"
+                                                           android:layout_height="match_parent"
+                                                           android:layout_marginLeft="16dp"
+                                                           android:layout_marginRight="16dp"
+                                                           android:layout_marginTop="16dp"
+                                                           android:background="@android:color/transparent"
+                                                           android:clipToPadding="false"
+                                                           android:fitsSystemWindows="false"
+                                                           android:gravity="center"
+                                                           android:orientation="vertical"
+                                                           android:paddingBottom="164dp">
 
     <ImageView
         android:id="@+id/mis_image_slide"
@@ -57,4 +57,4 @@
         android:visibility="invisible"
         tools:text="Message btn" />
 
-</agency.tango.materialintroscreen.parallax.ParallaxLinearLayout>
+</it.giccisw.util.introscreen.parallax.ParallaxLinearLayout>
