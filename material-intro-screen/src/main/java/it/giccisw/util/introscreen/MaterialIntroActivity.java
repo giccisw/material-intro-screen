@@ -13,18 +13,6 @@ import android.widget.LinearLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import it.giccisw.util.introscreen.adapter.SlidesAdapter;
-import it.giccisw.util.introscreen.animations.ViewTranslationWrapper;
-import it.giccisw.util.introscreen.animations.wrappers.BackButtonTranslationWrapper;
-import it.giccisw.util.introscreen.animations.wrappers.NextButtonTranslationWrapper;
-import it.giccisw.util.introscreen.animations.wrappers.PageIndicatorTranslationWrapper;
-import it.giccisw.util.introscreen.animations.wrappers.SkipButtonTranslationWrapper;
-import it.giccisw.util.introscreen.animations.wrappers.ViewPagerTranslationWrapper;
-import it.giccisw.util.introscreen.fragments.SlideFragmentBase;
-import it.giccisw.util.introscreen.listeners.IPageScrolledListener;
-import it.giccisw.util.introscreen.listeners.ViewBehavioursOnPageChangeListener;
-import it.giccisw.util.introscreen.listeners.scroll.ParallaxScrollListener;
-import it.giccisw.util.introscreen.widgets.InkPageIndicator;
 import androidx.annotation.CallSuper;
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -34,9 +22,21 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.viewpager.widget.ViewPager;
+import it.giccisw.util.introscreen.adapter.SlidesAdapter;
+import it.giccisw.util.introscreen.animations.ViewTranslationWrapper;
+import it.giccisw.util.introscreen.animations.wrappers.BackButtonTranslationWrapper;
+import it.giccisw.util.introscreen.animations.wrappers.NextButtonTranslationWrapper;
+import it.giccisw.util.introscreen.animations.wrappers.PageIndicatorTranslationWrapper;
+import it.giccisw.util.introscreen.animations.wrappers.SkipButtonTranslationWrapper;
+import it.giccisw.util.introscreen.animations.wrappers.ViewPagerTranslationWrapper;
+import it.giccisw.util.introscreen.fragments.SlideFragmentBase;
+import it.giccisw.util.introscreen.listeners.IPageScrolledListener;
+import it.giccisw.util.introscreen.listeners.SlideOnPageChangeListener;
+import it.giccisw.util.introscreen.listeners.scroll.ParallaxScrollListener;
+import it.giccisw.util.introscreen.widgets.InkPageIndicator;
 
 @SuppressWarnings("unused")
-public abstract class MaterialIntroActivity extends AppCompatActivity {
+public class MaterialIntroActivity extends AppCompatActivity /*implements ViewPager.OnPageChangeListener*/ {
 
     // the views
     private ViewPager viewPager;
@@ -98,7 +98,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         // configure the view pager
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener((ViewPager.OnPageChangeListener) new ViewBehavioursOnPageChangeListener(adapter)
+        viewPager.addOnPageChangeListener(new SlideOnPageChangeListener(adapter)
                 .registerViewTranslationWrapper(nextButtonTranslationWrapper)
                 .registerViewTranslationWrapper(backButtonTranslationWrapper)
                 .registerViewTranslationWrapper(pageIndicatorTranslationWrapper)
@@ -108,6 +108,7 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
                 .registerOnPageScrolled(new ColorTransitionScrollListener())
                 .registerOnPageScrolled(new ParallaxScrollListener(adapter))
         );
+//        viewPager.addOnPageChangeListener(this);
 
         // attach the page indicator to the view pager
         pageIndicator.setViewPager(viewPager);
@@ -122,9 +123,8 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        if (adapter.getCount() == 0) {
-            finish();
-        } else {
+        if (adapter.getCount() == 0) finish();
+        else {
             int currentItem = viewPager.getCurrentItem();
             nextButtonBehaviour(currentItem, adapter.getItem(currentItem));
         }
@@ -161,6 +161,36 @@ public abstract class MaterialIntroActivity extends AppCompatActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
+
+//    @Override
+//    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+//    {
+//        if (isFirstSlide(position)) {
+//            for (ViewTranslationWrapper wrapper : wrappers) {
+//                wrapper.enterTranslate(positionOffset);
+//            }
+//        } else if (adapter.isLastSlide(position)) {
+//            for (ViewTranslationWrapper wrapper : wrappers) {
+//                wrapper.exitTranslate(positionOffset);
+//            }
+//        } else {
+//            for (ViewTranslationWrapper wrapper : wrappers) {
+//                wrapper.defaultTranslate(positionOffset);
+//            }
+//        }
+//
+//        for (IPageScrolledListener pageScrolledListener : pageScrolledListeners) {
+//            pageScrolledListener.pageScrolled(position, positionOffset);
+//        }
+//
+//    }
+//
+//    @Override
+//    public void onPageSelected(int position) {}
+//
+//    @Override
+//    public void onPageScrollStateChanged(int state) {}
+
 
     /**
      * Add SlideFragmentBase to IntroScreen

@@ -7,7 +7,8 @@ import it.giccisw.util.introscreen.adapter.SlidesAdapter;
 import it.giccisw.util.introscreen.animations.ViewTranslationWrapper;
 import androidx.viewpager.widget.ViewPager;
 
-public class ViewBehavioursOnPageChangeListener implements ViewPager.OnPageChangeListener {
+/** Handles slide page changes */
+public class SlideOnPageChangeListener implements ViewPager.OnPageChangeListener {
 
     private final SlidesAdapter adapter;
 
@@ -15,23 +16,23 @@ public class ViewBehavioursOnPageChangeListener implements ViewPager.OnPageChang
     private List<ViewTranslationWrapper> wrappers = new ArrayList<>();
     private List<IPageScrolledListener> pageScrolledListeners = new ArrayList<>();
 
-    public ViewBehavioursOnPageChangeListener(SlidesAdapter adapter) {
+    public SlideOnPageChangeListener(SlidesAdapter adapter) {
         this.adapter = adapter;
     }
 
-    public ViewBehavioursOnPageChangeListener registerPageSelectedListener(
+    public SlideOnPageChangeListener registerPageSelectedListener(
             IPageSelectedListener pageSelectedListener) {
         listeners.add(pageSelectedListener);
         return this;
     }
 
-    public ViewBehavioursOnPageChangeListener registerViewTranslationWrapper(
+    public SlideOnPageChangeListener registerViewTranslationWrapper(
             ViewTranslationWrapper wrapper) {
         wrappers.add(wrapper);
         return this;
     }
 
-    public ViewBehavioursOnPageChangeListener registerOnPageScrolled(
+    public SlideOnPageChangeListener registerOnPageScrolled(
             IPageScrolledListener pageScrolledListener) {
         pageScrolledListeners.add(pageScrolledListener);
         return this;
