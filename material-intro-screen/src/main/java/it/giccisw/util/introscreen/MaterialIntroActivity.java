@@ -36,7 +36,7 @@ import it.giccisw.util.introscreen.listeners.scroll.ParallaxScrollListener;
 import it.giccisw.util.introscreen.widgets.InkPageIndicator;
 
 @SuppressWarnings("unused")
-public class MaterialIntroActivity extends AppCompatActivity /*implements ViewPager.OnPageChangeListener*/ {
+public class MaterialIntroActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
     // the views
     private ViewPager viewPager;
@@ -57,6 +57,7 @@ public class MaterialIntroActivity extends AppCompatActivity /*implements ViewPa
     private ViewTranslationWrapper pageIndicatorTranslationWrapper;
     private ViewTranslationWrapper viewPagerTranslationWrapper;
     private ViewTranslationWrapper skipButtonTranslationWrapper;
+    private IPageScrolledListener colorTransitionListener, parallaxListener;
 
     private View.OnClickListener permissionNotGrantedClickListener;
     private View.OnClickListener finishScreenClickListener;
@@ -88,27 +89,29 @@ public class MaterialIntroActivity extends AppCompatActivity /*implements ViewPa
         // create the adapter for the slides
         adapter = new SlidesAdapter(getSupportFragmentManager());
 
-        // create the default view translation wrappers
+        // create the view translation handlers
         nextButtonTranslationWrapper = new NextButtonTranslationWrapper(nextButton);
         backButtonTranslationWrapper = new BackButtonTranslationWrapper(backButton);
         pageIndicatorTranslationWrapper = new PageIndicatorTranslationWrapper(pageIndicator);
         viewPagerTranslationWrapper = new ViewPagerTranslationWrapper(viewPager);
         skipButtonTranslationWrapper = new SkipButtonTranslationWrapper(skipButton);
+        colorTransitionListener = new ColorTransitionScrollListener();
+        parallaxListener = new ParallaxScrollListener(adapter);
 
         // configure the view pager
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new SlideOnPageChangeListener(adapter)
-                .registerViewTranslationWrapper(nextButtonTranslationWrapper)
-                .registerViewTranslationWrapper(backButtonTranslationWrapper)
+//                .registerViewTranslationWrapper(nextButtonTranslationWrapper)
+//                .registerViewTranslationWrapper(backButtonTranslationWrapper)
                 .registerViewTranslationWrapper(pageIndicatorTranslationWrapper)
                 .registerViewTranslationWrapper(viewPagerTranslationWrapper)
                 .registerViewTranslationWrapper(skipButtonTranslationWrapper)
 
-                .registerOnPageScrolled(new ColorTransitionScrollListener())
-                .registerOnPageScrolled(new ParallaxScrollListener(adapter))
+//                .registerOnPageScrolled(new ColorTransitionScrollListener())
+//                .registerOnPageScrolled(new ParallaxScrollListener(adapter))
         );
-//        viewPager.addOnPageChangeListener(this);
+        viewPager.addOnPageChangeListener(this);
 
         // attach the page indicator to the view pager
         pageIndicator.setViewPager(viewPager);
@@ -162,9 +165,17 @@ public class MaterialIntroActivity extends AppCompatActivity /*implements ViewPa
         return super.onKeyDown(keyCode, event);
     }
 
-//    @Override
-//    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-//    {
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+    {
+        if (position == 0) {
+            // we are moving from/to the first slide
+            backButtonTranslationWrapper.enterTranslate(positionOffset);
+        }
+
+        if (!adapter.canMoveFurther(position + 1))
+            nextButtonTranslationWrapper.exitTranslate(positionOffset);
+
 //        if (isFirstSlide(position)) {
 //            for (ViewTranslationWrapper wrapper : wrappers) {
 //                wrapper.enterTranslate(positionOffset);
@@ -178,18 +189,16 @@ public class MaterialIntroActivity extends AppCompatActivity /*implements ViewPa
 //                wrapper.defaultTranslate(positionOffset);
 //            }
 //        }
-//
-//        for (IPageScrolledListener pageScrolledListener : pageScrolledListeners) {
-//            pageScrolledListener.pageScrolled(position, positionOffset);
-//        }
-//
-//    }
-//
-//    @Override
-//    public void onPageSelected(int position) {}
-//
-//    @Override
-//    public void onPageScrollStateChanged(int state) {}
+
+        colorTransitionListener.pageScrolled(position, positionOffset);
+        parallaxListener.pageScrolled(position, positionOffset);
+    }
+
+    @Override
+    public void onPageSelected(int position) {}
+
+    @Override
+    public void onPageScrollStateChanged(int state) {}
 
 
     /**

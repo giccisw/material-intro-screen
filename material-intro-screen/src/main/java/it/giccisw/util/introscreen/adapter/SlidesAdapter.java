@@ -65,6 +65,11 @@ public class SlidesAdapter extends FragmentPagerAdapter {
         notifyDataSetChanged();
     }
 
+    /**
+     * Checks if we canmove further the specified slide
+     * @param position The position of the slide to be checked
+     * @return true if we can move further it
+     */
     public boolean canMoveFurther(int position)
     {
         return canPass.get(position);
