@@ -15,15 +15,15 @@ import androidx.core.content.ContextCompat;
 
 public class SlideFragment extends SlideFragmentBase {
 
-    public static final String BACKGROUND_COLOR = "background_color";
-    public static final String BUTTONS_COLOR = "buttons_color";
-    public static final String TITLE = "title";
-    public static final String DESCRIPTION = "description";
-    public static final String MANDATORY_PERMISSIONS = "mandatory_permission";
-    public static final String OPTIONAL_PERMISSIONS = "optional_permission";
-    public static final String IMAGE = "image";
-    public static final String GRANT_PERMISSION_MESSAGE = "grant_permission_message";
-    public static final String GRANT_PERMISSION_ERROR = "grant_permission_error";
+    static final String BACKGROUND_COLOR = "background_color";
+    static final String BUTTONS_COLOR = "buttons_color";
+    static final String TITLE = "title";
+    static final String DESCRIPTION = "description";
+    static final String MANDATORY_PERMISSIONS = "mandatory_permission";
+    static final String OPTIONAL_PERMISSIONS = "optional_permission";
+    static final String IMAGE = "image";
+    static final String GRANT_PERMISSION_MESSAGE = "grant_permission_message";
+    static final String GRANT_PERMISSION_ERROR = "grant_permission_error";
 
     public static SlideFragment createInstance(Bundle bundle) {
         SlideFragment slideFragment = new SlideFragment();

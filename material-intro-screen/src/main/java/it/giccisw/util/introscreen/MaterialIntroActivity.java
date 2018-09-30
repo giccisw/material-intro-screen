@@ -2,8 +2,10 @@ package it.giccisw.util.introscreen;
 
 import android.animation.ArgbEvaluator;
 import android.content.res.ColorStateList;
+import android.database.DataSetObserver;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -36,7 +38,10 @@ import it.giccisw.util.introscreen.listeners.scroll.ParallaxScrollListener;
 import it.giccisw.util.introscreen.widgets.InkPageIndicator;
 
 @SuppressWarnings("unused")
-public class MaterialIntroActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+public class MaterialIntroActivity extends AppCompatActivity {
+
+    /** The log tag */
+    private final static String TAG = "MaterialIntroActivity";
 
     // the views
     private ViewPager viewPager;
@@ -47,9 +52,6 @@ public class MaterialIntroActivity extends AppCompatActivity implements ViewPage
     private ImageButton nextButton;
     private CoordinatorLayout coordinatorLayout;
     private LinearLayout navigationView;
-
-    /** Calculates color transitions */
-    private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
 
     // handlers for views translations
     private ViewTranslationWrapper nextButtonTranslationWrapper;
@@ -99,19 +101,22 @@ public class MaterialIntroActivity extends AppCompatActivity implements ViewPage
         parallaxListener = new ParallaxScrollListener(adapter);
 
         // configure the view pager
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(1); // do not use more as it will cause problems with fragments
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new SlideOnPageChangeListener(adapter)
 //                .registerViewTranslationWrapper(nextButtonTranslationWrapper)
 //                .registerViewTranslationWrapper(backButtonTranslationWrapper)
                 .registerViewTranslationWrapper(pageIndicatorTranslationWrapper)
-                .registerViewTranslationWrapper(viewPagerTranslationWrapper)
+//                .registerViewTranslationWrapper(viewPagerTranslationWrapper)
                 .registerViewTranslationWrapper(skipButtonTranslationWrapper)
 
 //                .registerOnPageScrolled(new ColorTransitionScrollListener())
 //                .registerOnPageScrolled(new ParallaxScrollListener(adapter))
         );
-        viewPager.addOnPageChangeListener(this);
+        ViewPagerObserver viewPagerObserver = new ViewPagerObserver();
+        viewPager.addOnPageChangeListener(viewPagerObserver);
+        viewPager.getAdapter().registerDataSetObserver(viewPagerObserver);
+
 
         // attach the page indicator to the view pager
         pageIndicator.setViewPager(viewPager);
@@ -165,42 +170,6 @@ public class MaterialIntroActivity extends AppCompatActivity implements ViewPage
         return super.onKeyDown(keyCode, event);
     }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-    {
-        if (position == 0) {
-            // we are moving from/to the first slide
-            backButtonTranslationWrapper.enterTranslate(positionOffset);
-        }
-
-        if (!adapter.canMoveFurther(position + 1))
-            nextButtonTranslationWrapper.exitTranslate(positionOffset);
-
-//        if (isFirstSlide(position)) {
-//            for (ViewTranslationWrapper wrapper : wrappers) {
-//                wrapper.enterTranslate(positionOffset);
-//            }
-//        } else if (adapter.isLastSlide(position)) {
-//            for (ViewTranslationWrapper wrapper : wrappers) {
-//                wrapper.exitTranslate(positionOffset);
-//            }
-//        } else {
-//            for (ViewTranslationWrapper wrapper : wrappers) {
-//                wrapper.defaultTranslate(positionOffset);
-//            }
-//        }
-
-        colorTransitionListener.pageScrolled(position, positionOffset);
-        parallaxListener.pageScrolled(position, positionOffset);
-    }
-
-    @Override
-    public void onPageSelected(int position) {}
-
-    @Override
-    public void onPageScrollStateChanged(int state) {}
-
-
     /**
      * Add SlideFragmentBase to IntroScreen
      * @param slideFragmentBase Fragment to add
@@ -209,9 +178,13 @@ public class MaterialIntroActivity extends AppCompatActivity implements ViewPage
         adapter.setSlide(slideFragmentBase, true);
     }
 
-    public void canMoveChange(SlideFragmentBase fragment, boolean canMoveFurther)
-    {
-        adapter.setSlide(fragment, canMoveFurther);
+    /**
+     * Changes the possibility to pass over the specified slide
+     * @param fragmentBase The slide's fragment
+     * @param canMoveFurther true if the slide can be passed
+     */
+    public void setCanMoveFurther(SlideFragmentBase fragmentBase, boolean canMoveFurther) {
+        adapter.setSlide(fragmentBase, canMoveFurther);
     }
 
     /** Set skip button instead of back button */
@@ -371,35 +344,77 @@ public class MaterialIntroActivity extends AppCompatActivity implements ViewPage
                 }).show();
     }
 
-    private int getBackgroundEvaluatedColor(int position, float positionOffset) {
-        return (int) argbEvaluator.evaluate(positionOffset, getBackgroundColor(position),
-                getBackgroundColor(position + 1));
-    }
+    /** Reacts to changes in the ViewPager position */
+    private class ViewPagerObserver extends DataSetObserver implements ViewPager.OnPageChangeListener {
 
-    private int getButtonsEvaluatedColor(int position, float positionOffset) {
-        return (int) argbEvaluator
-                .evaluate(positionOffset, getButtonsColor(position), getButtonsColor(position + 1));
-    }
+        /** Scroll state */
+        private int state;
 
-    @ColorInt
-    private int getColorFromRes(@ColorRes int color) {
-        return ContextCompat.getColor(this, color);
-    }
+        /** Selected page, if state != 0 */
+        private int selected = -1;
 
-    private int getButtonsColor(int position) {
-        return getColorFromRes(adapter.getItem(position).buttonsColor());
-    }
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+        {
+            if (BuildConfig.DEBUG) Log.d(TAG, "onPageScrolled position=" + position +
+                    " offset=" + positionOffset +
+                    " pixels=" + positionOffsetPixels);
 
-    private int getBackgroundColor(int position) {
-        return getColorFromRes(adapter.getItem(position).backgroundColor());
-    }
+            // back button
+            if (position == 0) {
+                // we are moving from/to the first slide
+                backButtonTranslationWrapper.enterTranslate(positionOffset);
+            }
 
-    public void setCanMoveFurther(SlideFragmentBase fragmentBase, boolean canMoveFurther)
-    {
-        adapter.setSlide(fragmentBase, canMoveFurther);
+//            // next button
+//            boolean canMoveFurther = adapter.canMoveFurther(positionOffset != 0 ? position + 1 : position);
+
+            if (!adapter.canMoveFurther(positionOffset != 0 ? position + 1 : position))
+                nextButtonTranslationWrapper.exitTranslate(positionOffset);
+
+//        if (isFirstSlide(position)) {
+//            for (ViewTranslationWrapper wrapper : wrappers) {
+//                wrapper.enterTranslate(positionOffset);
+//            }
+//        } else if (adapter.isLastSlide(position)) {
+//            for (ViewTranslationWrapper wrapper : wrappers) {
+//                wrapper.exitTranslate(positionOffset);
+//            }
+//        } else {
+//            for (ViewTranslationWrapper wrapper : wrappers) {
+//                wrapper.defaultTranslate(positionOffset);
+//            }
+//        }
+
+            colorTransitionListener.pageScrolled(position, positionOffset);
+            parallaxListener.pageScrolled(position, positionOffset);
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            if (BuildConfig.DEBUG) Log.d(TAG, "onPageSelected position=" + position);
+            this.selected = position;
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            if (BuildConfig.DEBUG) Log.d(TAG, "onPageScrollStateChanged state=" + state);
+            this.state = state;
+            if (state == 0) {
+                selected = -1;
+            }
+        }
+
+        @Override
+        public void onChanged() {
+            if (BuildConfig.DEBUG) Log.d(TAG, "onChanged");
+        }
     }
 
     private class ColorTransitionScrollListener implements IPageScrolledListener {
+
+        /** Calculates color transitions */
+        private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
 
         @Override
         public void pageScrolled(int position, float offset) {
@@ -428,6 +443,29 @@ public class MaterialIntroActivity extends AppCompatActivity implements ViewPage
 
         private boolean isOnLastSlide(int position, float offset) {
             return position == adapter.getLastItemPosition() && offset == 0;
+        }
+
+        @ColorInt
+        private int getColorFromRes(@ColorRes int color) {
+            return ContextCompat.getColor(MaterialIntroActivity.this, color);
+        }
+
+        private int getButtonsColor(int position) {
+            return getColorFromRes(adapter.getItem(position).buttonsColor());
+        }
+
+        private int getBackgroundColor(int position) {
+            return getColorFromRes(adapter.getItem(position).backgroundColor());
+        }
+
+        private int getBackgroundEvaluatedColor(int position, float positionOffset) {
+            return (int) argbEvaluator.evaluate(positionOffset, getBackgroundColor(position),
+                    getBackgroundColor(position + 1));
+        }
+
+        private int getButtonsEvaluatedColor(int position, float positionOffset) {
+            return (int) argbEvaluator
+                    .evaluate(positionOffset, getButtonsColor(position), getButtonsColor(position + 1));
         }
 
         private void tintButtons(ColorStateList color) {
