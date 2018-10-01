@@ -1,5 +1,7 @@
 package it.giccisw.util.introscreen;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.animation.ArgbEvaluator;
 import android.content.res.ColorStateList;
 import android.database.DataSetObserver;
@@ -347,15 +349,22 @@ public class MaterialIntroActivity extends AppCompatActivity {
     /** Reacts to changes in the ViewPager position */
     private class ViewPagerObserver extends DataSetObserver implements ViewPager.OnPageChangeListener {
 
+        /** Shown state for buttons */
+        private boolean nextShown = true;
+
         /** Scroll state */
         private int state;
 
         /** Selected page, if state != 0 */
         private int selected = -1;
 
+//        private Animation exitAnimation = AnimationUtils.loadAnimation(MaterialIntroActivity.this, R.animator.mis_exit);
+//        private Animation enterAnimation = AnimationUtils.loadAnimation(MaterialIntroActivity.this, R.anim.mis_enter);
+
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
         {
+
             if (BuildConfig.DEBUG) Log.d(TAG, "onPageScrolled position=" + position +
                     " offset=" + positionOffset +
                     " pixels=" + positionOffsetPixels);
@@ -366,8 +375,22 @@ public class MaterialIntroActivity extends AppCompatActivity {
                 backButtonTranslationWrapper.enterTranslate(positionOffset);
             }
 
-//            // next button
-//            boolean canMoveFurther = adapter.canMoveFurther(positionOffset != 0 ? position + 1 : position);
+            // next button
+            if (state == 0) {
+                boolean canMoveFurther = adapter.canMoveFurther(position);
+                if (!canMoveFurther && nextShown) {
+                    int offset = getResources().getDimensionPixelOffset(R.dimen.mis_y_offset);
+                    Animator set = AnimatorInflater.loadAnimator(MaterialIntroActivity.this, R.animator.mis_exit);
+                    set.setTarget(nextButton); // set the view you want to animate
+                    set.start();
+//                    nextButton.startAnimation(exitAnimation);
+                    nextShown = false;
+                }
+//                else if (canMoveFurther && !nextShown) {
+//                    nextButton.startAnimation(enterAnimation);
+//                    nextShown = true;
+//                }
+            }
 
             if (!adapter.canMoveFurther(positionOffset != 0 ? position + 1 : position))
                 nextButtonTranslationWrapper.exitTranslate(positionOffset);
