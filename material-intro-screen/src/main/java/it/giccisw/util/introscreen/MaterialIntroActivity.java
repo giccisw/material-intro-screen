@@ -306,7 +306,7 @@ public class MaterialIntroActivity extends AppCompatActivity {
             // next button
             if (state == 0) nextButtonHandler.activate(adapter.canMoveFurther(position));
             else {
-                int x = (adapter.canMoveFurther(position + 1) ? 1 : 0) -
+                int x = (adapter.isLastSlide(position) || adapter.canMoveFurther(position + 1) ? 1 : 0) -
                         (adapter.canMoveFurther(position) ? 1 : 0);
                 if (x == 1) nextButtonHandler.activate(positionOffset);
                 else if (x == -1) nextButtonHandler.activate(1 - positionOffset);
