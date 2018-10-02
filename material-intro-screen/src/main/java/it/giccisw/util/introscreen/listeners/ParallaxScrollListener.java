@@ -1,11 +1,10 @@
-package it.giccisw.util.introscreen.listeners.scroll;
+package it.giccisw.util.introscreen.listeners;
 
-import it.giccisw.util.introscreen.adapter.SlidesAdapter;
-import it.giccisw.util.introscreen.fragments.SlideFragmentBase;
-import it.giccisw.util.introscreen.listeners.IPageScrolledListener;
-import it.giccisw.util.introscreen.parallax.Parallaxable;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import it.giccisw.util.introscreen.adapter.SlidesAdapter;
+import it.giccisw.util.introscreen.fragments.SlideFragmentBase;
+import it.giccisw.util.introscreen.parallax.Parallaxable;
 
 public class ParallaxScrollListener implements IPageScrolledListener {
 

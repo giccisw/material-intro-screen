@@ -4,13 +4,13 @@
         android:duration="200"
         android:propertyName="translationY"
         android:valueType="floatType"
-        android:valueFrom="0"
-        android:valueTo="@dimen/mis_y_offset"
+        android:valueFrom="@dimen/mis_y_offset"
+        android:valueTo="0"
          />
     <objectAnimator
         android:duration="200"
         android:propertyName="alpha"
         android:valueType="floatType"
-        android:valueFrom="1"
-        android:valueTo="0" />
+        android:valueFrom="0"
+        android:valueTo="1" />
 </set>

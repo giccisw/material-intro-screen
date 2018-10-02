@@ -1,7 +1,5 @@
 package it.giccisw.util.introscreen;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
 import android.animation.ArgbEvaluator;
 import android.content.res.ColorStateList;
 import android.database.DataSetObserver;
@@ -27,16 +25,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.viewpager.widget.ViewPager;
 import it.giccisw.util.introscreen.adapter.SlidesAdapter;
-import it.giccisw.util.introscreen.animations.ViewTranslationWrapper;
-import it.giccisw.util.introscreen.animations.wrappers.BackButtonTranslationWrapper;
-import it.giccisw.util.introscreen.animations.wrappers.NextButtonTranslationWrapper;
-import it.giccisw.util.introscreen.animations.wrappers.PageIndicatorTranslationWrapper;
-import it.giccisw.util.introscreen.animations.wrappers.SkipButtonTranslationWrapper;
-import it.giccisw.util.introscreen.animations.wrappers.ViewPagerTranslationWrapper;
+import it.giccisw.util.introscreen.animations.ButtonHandler;
 import it.giccisw.util.introscreen.fragments.SlideFragmentBase;
 import it.giccisw.util.introscreen.listeners.IPageScrolledListener;
-import it.giccisw.util.introscreen.listeners.SlideOnPageChangeListener;
-import it.giccisw.util.introscreen.listeners.scroll.ParallaxScrollListener;
+import it.giccisw.util.introscreen.listeners.ParallaxScrollListener;
 import it.giccisw.util.introscreen.widgets.InkPageIndicator;
 
 @SuppressWarnings("unused")
@@ -55,13 +47,8 @@ public class MaterialIntroActivity extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
     private LinearLayout navigationView;
 
-    // handlers for views translations
-    private ViewTranslationWrapper nextButtonTranslationWrapper;
-    private ViewTranslationWrapper backButtonTranslationWrapper;
-    private ViewTranslationWrapper pageIndicatorTranslationWrapper;
-    private ViewTranslationWrapper viewPagerTranslationWrapper;
-    private ViewTranslationWrapper skipButtonTranslationWrapper;
-    private IPageScrolledListener colorTransitionListener, parallaxListener;
+    /** Button handlers */
+    ButtonHandler backButtonHandler, nextButtonHandler;
 
     private View.OnClickListener permissionNotGrantedClickListener;
     private View.OnClickListener finishScreenClickListener;
@@ -93,28 +80,13 @@ public class MaterialIntroActivity extends AppCompatActivity {
         // create the adapter for the slides
         adapter = new SlidesAdapter(getSupportFragmentManager());
 
-        // create the view translation handlers
-        nextButtonTranslationWrapper = new NextButtonTranslationWrapper(nextButton);
-        backButtonTranslationWrapper = new BackButtonTranslationWrapper(backButton);
-        pageIndicatorTranslationWrapper = new PageIndicatorTranslationWrapper(pageIndicator);
-        viewPagerTranslationWrapper = new ViewPagerTranslationWrapper(viewPager);
-        skipButtonTranslationWrapper = new SkipButtonTranslationWrapper(skipButton);
-        colorTransitionListener = new ColorTransitionScrollListener();
-        parallaxListener = new ParallaxScrollListener(adapter);
+        // create thge button handlers
+        backButtonHandler = new ButtonHandler(backButton);
+        nextButtonHandler = new ButtonHandler(nextButton);
 
         // configure the view pager
         viewPager.setOffscreenPageLimit(1); // do not use more as it will cause problems with fragments
         viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new SlideOnPageChangeListener(adapter)
-//                .registerViewTranslationWrapper(nextButtonTranslationWrapper)
-//                .registerViewTranslationWrapper(backButtonTranslationWrapper)
-                .registerViewTranslationWrapper(pageIndicatorTranslationWrapper)
-//                .registerViewTranslationWrapper(viewPagerTranslationWrapper)
-                .registerViewTranslationWrapper(skipButtonTranslationWrapper)
-
-//                .registerOnPageScrolled(new ColorTransitionScrollListener())
-//                .registerOnPageScrolled(new ParallaxScrollListener(adapter))
-        );
         ViewPagerObserver viewPagerObserver = new ViewPagerObserver();
         viewPager.addOnPageChangeListener(viewPagerObserver);
         viewPager.getAdapter().registerDataSetObserver(viewPagerObserver);
@@ -230,47 +202,6 @@ public class MaterialIntroActivity extends AppCompatActivity {
     }
 
     /**
-     * Get translation wrapper for next button
-     * @return ViewTranslationWrapper
-     */
-    public ViewTranslationWrapper getNextButtonTranslationWrapper() {
-        return nextButtonTranslationWrapper;
-    }
-
-    /**
-     * Get translation wrapper for back button
-     * @return ViewTranslationWrapper
-     */
-    public ViewTranslationWrapper getBackButtonTranslationWrapper() {
-        return backButtonTranslationWrapper;
-    }
-
-    /**
-     * Get translation wrapper for page indicator
-     * @return ViewTranslationWrapper
-     */
-    public ViewTranslationWrapper getPageIndicatorTranslationWrapper() {
-        return pageIndicatorTranslationWrapper;
-    }
-
-    /**
-     * Get translation wrapper for view pager
-     *
-     * @return ViewTranslationWrapper
-     */
-    public ViewTranslationWrapper getViewPagerTranslationWrapper() {
-        return viewPagerTranslationWrapper;
-    }
-
-    /**
-     * Get translation wrapper for skip button
-     * @return ViewTranslationWrapper
-     */
-    public ViewTranslationWrapper getSkipButtonTranslationWrapper() {
-        return skipButtonTranslationWrapper;
-    }
-
-    /**
      * Show snackbar message
      * @param message Message which will be visible to user
      */
@@ -331,7 +262,7 @@ public class MaterialIntroActivity extends AppCompatActivity {
     }
 
     private void errorOccurred(SlideFragmentBase slideFragmentBase) {
-        nextButtonTranslationWrapper.error();
+//        nextButtonTranslationWrapper.error();
         showError(getString(slideFragmentBase.cantMoveFurtherErrorString()));
     }
 
@@ -349,8 +280,9 @@ public class MaterialIntroActivity extends AppCompatActivity {
     /** Reacts to changes in the ViewPager position */
     private class ViewPagerObserver extends DataSetObserver implements ViewPager.OnPageChangeListener {
 
-        /** Shown state for buttons */
-        private boolean nextShown = true;
+        /** Handlers for views translations */
+        private IPageScrolledListener colorTransitionListener = new ColorTransitionScrollListener(),
+                parallaxListener = new ParallaxScrollListener(adapter);
 
         /** Scroll state */
         private int state;
@@ -358,13 +290,9 @@ public class MaterialIntroActivity extends AppCompatActivity {
         /** Selected page, if state != 0 */
         private int selected = -1;
 
-//        private Animation exitAnimation = AnimationUtils.loadAnimation(MaterialIntroActivity.this, R.animator.mis_exit);
-//        private Animation enterAnimation = AnimationUtils.loadAnimation(MaterialIntroActivity.this, R.anim.mis_enter);
-
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
         {
-
             if (BuildConfig.DEBUG) Log.d(TAG, "onPageScrolled position=" + position +
                     " offset=" + positionOffset +
                     " pixels=" + positionOffsetPixels);
@@ -372,43 +300,19 @@ public class MaterialIntroActivity extends AppCompatActivity {
             // back button
             if (position == 0) {
                 // we are moving from/to the first slide
-                backButtonTranslationWrapper.enterTranslate(positionOffset);
+                backButtonHandler.activate(positionOffset);
             }
 
             // next button
-            if (state == 0) {
-                boolean canMoveFurther = adapter.canMoveFurther(position);
-                if (!canMoveFurther && nextShown) {
-                    int offset = getResources().getDimensionPixelOffset(R.dimen.mis_y_offset);
-                    Animator set = AnimatorInflater.loadAnimator(MaterialIntroActivity.this, R.animator.mis_exit);
-                    set.setTarget(nextButton); // set the view you want to animate
-                    set.start();
-//                    nextButton.startAnimation(exitAnimation);
-                    nextShown = false;
-                }
-//                else if (canMoveFurther && !nextShown) {
-//                    nextButton.startAnimation(enterAnimation);
-//                    nextShown = true;
-//                }
+            if (state == 0) nextButtonHandler.activate(adapter.canMoveFurther(position));
+            else {
+                int x = (adapter.canMoveFurther(position + 1) ? 1 : 0) -
+                        (adapter.canMoveFurther(position) ? 1 : 0);
+                if (x == 1) nextButtonHandler.activate(positionOffset);
+                else if (x == -1) nextButtonHandler.activate(1 - positionOffset);
             }
 
-            if (!adapter.canMoveFurther(positionOffset != 0 ? position + 1 : position))
-                nextButtonTranslationWrapper.exitTranslate(positionOffset);
-
-//        if (isFirstSlide(position)) {
-//            for (ViewTranslationWrapper wrapper : wrappers) {
-//                wrapper.enterTranslate(positionOffset);
-//            }
-//        } else if (adapter.isLastSlide(position)) {
-//            for (ViewTranslationWrapper wrapper : wrappers) {
-//                wrapper.exitTranslate(positionOffset);
-//            }
-//        } else {
-//            for (ViewTranslationWrapper wrapper : wrappers) {
-//                wrapper.defaultTranslate(positionOffset);
-//            }
-//        }
-
+            // apply transitions
             colorTransitionListener.pageScrolled(position, positionOffset);
             parallaxListener.pageScrolled(position, positionOffset);
         }
