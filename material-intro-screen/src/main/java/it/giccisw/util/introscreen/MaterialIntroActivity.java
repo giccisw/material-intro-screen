@@ -149,7 +149,7 @@ public class MaterialIntroActivity extends AppCompatActivity {
      * @param slideFragmentBase Fragment to add
      */
     public void addSlide(SlideFragmentBase slideFragmentBase) {
-        adapter.setSlide(slideFragmentBase, true);
+        adapter.addSlide(slideFragmentBase);
     }
 
     /**

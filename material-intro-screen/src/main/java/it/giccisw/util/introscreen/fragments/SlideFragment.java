@@ -15,6 +15,9 @@ import androidx.core.content.ContextCompat;
 
 public class SlideFragment extends SlideFragmentBase {
 
+    /** The log tag */
+    private final static String TAG = "SlideFragment";
+
     static final String BACKGROUND_COLOR = "background_color";
     static final String BUTTONS_COLOR = "buttons_color";
     static final String TITLE = "title";
@@ -36,7 +39,8 @@ public class SlideFragment extends SlideFragmentBase {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+                             @Nullable Bundle savedInstanceState)
+    {
 
         View view = inflater.inflate(R.layout.mis_fragment_slide, container, false);
         TextView titleTextView = view.findViewById(R.id.mis_txt_title_slide);
