@@ -1,5 +1,7 @@
 package it.giccisw.util.introscreen.adapter;
 
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.ViewGroup;
 
@@ -57,6 +59,29 @@ public class SlidesAdapter extends FragmentPagerAdapter {
         return fragments.indexOf(object) < numAccessibleSlides ? POSITION_UNCHANGED : POSITION_NONE;
     }
 
+    @Override
+    public Parcelable saveState()
+    {
+        if (canPass.size() == 0) return null;
+        Bundle state = new Bundle();
+        boolean[] b = new boolean[canPass.size()];
+        for (int i = 0; i < b.length; i++) b[i] = canPass.get(i);
+        state.putBooleanArray("canPass", b);
+        if (BuildConfig.DEBUG) Log.d(TAG, "Saved state: " + state);
+        return state;
+    }
+
+    @Override
+    public void restoreState(Parcelable state, ClassLoader loader)
+    {
+        if (BuildConfig.DEBUG) Log.d(TAG, "Restoring state: " + state);
+//        if (state != null) {
+//            Bundle bundle = (Bundle) state;
+//            bundle.setClassLoader(loader);
+//
+//        }
+    }
+
     /**
      * Returns the total number of slides in all sections
      * @return The total number of slides in all sections
@@ -105,7 +130,7 @@ public class SlidesAdapter extends FragmentPagerAdapter {
 
         if (BuildConfig.DEBUG) Log.d(TAG, "Changing slide " + fragment +
                 " canMoveFurther=" + canMoveFurther);
-        canPass.set(n, canMoveFurther);
+        if (canPass.set(n, canMoveFurther) == canMoveFurther) return;
 
         // recalculate the number of accessible slides and notify data set change if needed
         if (recalculateAccessibleSlides()) notifyDataSetChanged();
