@@ -13,7 +13,7 @@
                                                            android:fitsSystemWindows="false"
                                                            android:gravity="center"
                                                            android:orientation="vertical"
-                                                           android:paddingBottom="164dp">
+                                                           android:paddingBottom="@dimen/mis_slide_bottom_padding">
 
     <ImageView
         android:id="@+id/mis_image_slide"

@@ -91,7 +91,6 @@ public class MaterialIntroActivity extends AppCompatActivity {
         viewPager.addOnPageChangeListener(viewPagerObserver);
         viewPager.getAdapter().registerDataSetObserver(viewPagerObserver);
 
-
         // attach the page indicator to the view pager
         pageIndicator.setViewPager(viewPager);
 

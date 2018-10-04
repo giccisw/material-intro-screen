@@ -22,7 +22,7 @@ public class ButtonHandler {
 
     public ButtonHandler(View button) {
         this.button = button;
-        yOffset = button.getResources().getDimensionPixelOffset(R.dimen.mis_y_offset);
+        yOffset = button.getResources().getDimensionPixelOffset(R.dimen.mis_y_button_offset);
         activateAnimator = AnimatorInflater.loadAnimator(button.getContext(), R.animator.mis_enter);
         activateAnimator.setTarget(button);
         deactivateAnimator = AnimatorInflater.loadAnimator(button.getContext(), R.animator.mis_exit);

@@ -5,7 +5,7 @@
                                                            android:layout_height="match_parent"
                                                            android:background="@android:color/transparent"
                                                            android:orientation="vertical"
-                                                           android:paddingBottom="164dp">
+                                                           android:paddingBottom="@dimen/mis_slide_bottom_padding">
 
     <ScrollView
         android:layout_width="match_parent"

@@ -151,7 +151,7 @@ public class SlideFragmentBase extends ParallaxFragment {
 
         // ask for the missing permissions
         ActivityCompat.requestPermissions(getActivity(),
-                notGrantedPermissions.toArray(new String[notGrantedPermissions.size()]),
+                notGrantedPermissions.toArray(new String[0]),
                 PERMISSIONS_REQUEST_CODE);
     }
 

@@ -4,7 +4,7 @@
         android:duration="200"
         android:propertyName="translationY"
         android:valueType="floatType"
-        android:valueFrom="@dimen/mis_y_offset"
+        android:valueFrom="@dimen/mis_y_button_offset"
         android:valueTo="0"
          />
     <objectAnimator
