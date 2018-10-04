@@ -31,7 +31,6 @@ import it.giccisw.util.introscreen.listeners.IPageScrolledListener;
 import it.giccisw.util.introscreen.listeners.ParallaxScrollListener;
 import it.giccisw.util.introscreen.widgets.InkPageIndicator;
 
-@SuppressWarnings("unused")
 public class MaterialIntroActivity extends AppCompatActivity {
 
     /** The log tag */
@@ -49,9 +48,6 @@ public class MaterialIntroActivity extends AppCompatActivity {
 
     /** Button handlers */
     ButtonHandler backButtonHandler, nextButtonHandler;
-
-    private View.OnClickListener permissionNotGrantedClickListener;
-    private View.OnClickListener finishScreenClickListener;
 
     @Override
     @CallSuper
@@ -80,9 +76,23 @@ public class MaterialIntroActivity extends AppCompatActivity {
         // create the adapter for the slides
         adapter = new SlidesAdapter(getSupportFragmentManager());
 
-        // create thge button handlers
+        // create the button handlers
         backButtonHandler = new ButtonHandler(backButton);
         nextButtonHandler = new ButtonHandler(nextButton);
+
+        // attach actions to buttons
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                moveBack();
+            }
+        });
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                moveForward();
+            }
+        });
 
         // configure the view pager
         viewPager.setOffscreenPageLimit(1); // do not use more as it will cause problems with fragments
@@ -93,8 +103,6 @@ public class MaterialIntroActivity extends AppCompatActivity {
 
         // attach the page indicator to the view pager
         pageIndicator.setViewPager(viewPager);
-
-        finishScreenClickListener = new FinishScreenClickListener();
 
         // show back button by default
         setBackButtonVisible();
@@ -109,14 +117,6 @@ public class MaterialIntroActivity extends AppCompatActivity {
             int currentItem = viewPager.getCurrentItem();
             nextButtonBehaviour(currentItem, adapter.getItem(currentItem));
         }
-    }
-
-    /**
-     * Returns the current slide
-     * @return The current slide
-     */
-    protected SlideFragmentBase getCurrentSlide() {
-        return adapter.getItem(viewPager.getCurrentItem());
     }
 
     @Override
@@ -140,7 +140,15 @@ public class MaterialIntroActivity extends AppCompatActivity {
             default:
                 return super.onKeyDown(keyCode, event);
         }
-        return super.onKeyDown(keyCode, event);
+        return true;
+    }
+
+    /**
+     * Returns the current slide
+     * @return The current slide
+     */
+    protected SlideFragmentBase getCurrentSlide() {
+        return adapter.getItem(viewPager.getCurrentItem());
     }
 
     /**
@@ -186,12 +194,6 @@ public class MaterialIntroActivity extends AppCompatActivity {
         skipButton.setVisibility(View.GONE);
 
         backButton.setVisibility(View.VISIBLE);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
-            }
-        });
     }
 
     /** Hides back  button */
@@ -214,28 +216,12 @@ public class MaterialIntroActivity extends AppCompatActivity {
         // abstract as it would force user to implement this, even if he wouldn't like to.
     }
 
-    @SuppressWarnings("PointlessBooleanExpression")
-    private void nextButtonBehaviour(final int position, final SlideFragmentBase fragment) {
-//        boolean hasPermissionToGrant = fragment.hasNeededPermissionsToGrant();
-        boolean hasPermissionToGrant = false;
-        if (hasPermissionToGrant) {
-            nextButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.mis_ic_next));
-            nextButton.setOnClickListener(permissionNotGrantedClickListener);
-        } else if (adapter.isLastSlide(position)) {
+    private void nextButtonBehaviour(final int position, final SlideFragmentBase fragment)
+    {
+        if (adapter.isLastSlide(position)) {
             nextButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.mis_ic_finish));
-            nextButton.setOnClickListener(finishScreenClickListener);
         } else {
             nextButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.mis_ic_next));
-            nextButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (adapter.canMoveFurther(position)) {
-                        viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-                    } else {
-                        errorOccurred(fragment);
-                    }
-                }
-            });
         }
     }
 
@@ -247,8 +233,8 @@ public class MaterialIntroActivity extends AppCompatActivity {
     /** Move to previous slide */
     protected void moveBack()
     {
-        if (viewPager.getCurrentItem() == 0) finish();
-        else viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
+        if (viewPager.getCurrentItem() > 0)
+            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
     }
 
     /** Move to next slide */
@@ -398,20 +384,6 @@ public class MaterialIntroActivity extends AppCompatActivity {
             ViewCompat.setBackgroundTintList(nextButton, color);
             ViewCompat.setBackgroundTintList(backButton, color);
             ViewCompat.setBackgroundTintList(skipButton, color);
-        }
-    }
-
-    private class FinishScreenClickListener implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            int n = adapter.getLastItemPosition();
-            SlideFragmentBase slideFragment = adapter.getItem(n);
-            if (!adapter.canMoveFurther(n)) {
-                errorOccurred(slideFragment);
-            } else {
-                performFinish();
-            }
         }
     }
 }

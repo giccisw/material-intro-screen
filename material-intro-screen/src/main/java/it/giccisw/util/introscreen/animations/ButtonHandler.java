@@ -15,10 +15,11 @@ public class ButtonHandler {
     /** The default Y translation offset */
     protected int yOffset;
 
+    /** Activation and deactivation animation */
     protected Animator activateAnimator, deactivateAnimator;
 
+    /** True if we are active */
     protected boolean active;
-
 
     public ButtonHandler(View button) {
         this.button = button;

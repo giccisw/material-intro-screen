@@ -9,14 +9,13 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
-import it.giccisw.util.introscreen.MaterialIntroActivity;
-import it.giccisw.util.introscreen.R;
-import it.giccisw.util.introscreen.parallax.ParallaxFragment;
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import it.giccisw.util.introscreen.MaterialIntroActivity;
+import it.giccisw.util.introscreen.R;
+import it.giccisw.util.introscreen.parallax.ParallaxFragment;
 
 public class SlideFragmentBase extends ParallaxFragment {
 
@@ -150,9 +149,7 @@ public class SlideFragmentBase extends ParallaxFragment {
         }
 
         // ask for the missing permissions
-        ActivityCompat.requestPermissions(getActivity(),
-                notGrantedPermissions.toArray(new String[0]),
-                PERMISSIONS_REQUEST_CODE);
+        requestPermissions(notGrantedPermissions.toArray(new String[0]), PERMISSIONS_REQUEST_CODE);
     }
 
     /**
