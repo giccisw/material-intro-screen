@@ -16,6 +16,11 @@ public class CustomSlide extends SlideFragmentBase {
     private CheckBox checkBox;
 
     @Override
+    public boolean onSlideAttached() {
+        return false;
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_custom_slide, container, false);
@@ -30,12 +35,6 @@ public class CustomSlide extends SlideFragmentBase {
         if (savedInstanceState != null) accepted = savedInstanceState.getBoolean("checkbox");
         cantMoveFurtherErrorString = R.string.error_message;
         return view;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setCanMoveFurther(accepted);
     }
 
     @Override

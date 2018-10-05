@@ -95,7 +95,7 @@ public class MaterialIntroActivity extends AppCompatActivity {
         });
 
         // configure the view pager
-        viewPager.setOffscreenPageLimit(1); // do not use more as it will cause problems with fragments
+        viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
         ViewPagerObserver viewPagerObserver = new ViewPagerObserver();
         viewPager.addOnPageChangeListener(viewPagerObserver);

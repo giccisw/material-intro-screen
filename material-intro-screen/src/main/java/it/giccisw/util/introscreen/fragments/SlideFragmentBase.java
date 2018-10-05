@@ -69,24 +69,33 @@ public class SlideFragmentBase extends ParallaxFragment {
                                            @NonNull int[] grantResults)
     {
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
-            boolean hasNeededPermissionsToGrant = fixForPermissions();
-            if (hasNeededPermissionsToGrant) showError(getString(grantPermissionErrorStringRes));
+            boolean hasMandatoryPermissionsToGrant = hasMandatoryPermissionsToGrant();
+            setCanMoveFurther(!hasMandatoryPermissionsToGrant);
+            fixForPermissions(hasMandatoryPermissionsToGrant, hasOptionalPermissionsToGrant());
+            if (hasMandatoryPermissionsToGrant) showError(getString(grantPermissionErrorStringRes));
         }
         else super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    /**
+     * This method is called just once when the slide is first attached in the view pager
+     * @return The init value for canMoveForward
+     * */
+    public boolean onSlideAttached()
+    {
+        return !hasMandatoryPermissionsToGrant();
     }
 
     /** Called when the DPAD_CENTER key is pressed */
     public void onDPadCenter() {}
 
     /**
-     * Changes the slide behaviour depending on the permission state
-     * @return true if there are needed permissions to be granted
+     * Changes the slide depending on the permission state
+     * @param hasMandatoryPermissionsToGrant If true there are mandatory permissions to be granted
+     * @param hasOptionalPermissionsToGrant if true there are optional permissions to be granted
      */
-    protected boolean fixForPermissions() {
-        boolean hasNeededPermissionsToGrant = hasNeededPermissionsToGrant();
-        setCanMoveFurther(!hasNeededPermissionsToGrant);
-        return hasNeededPermissionsToGrant;
-    }
+    protected void fixForPermissions(boolean hasMandatoryPermissionsToGrant, boolean hasOptionalPermissionsToGrant)
+    {}
 
     /**
      * Changes the possibility to pass over this slide
@@ -128,8 +137,16 @@ public class SlideFragmentBase extends ParallaxFragment {
      * Checks if there are any mandatory permission to be granted
      * @return True if there is at least a mandatory permission which shall be granted
      */
-    protected boolean hasNeededPermissionsToGrant() {
+    protected boolean hasMandatoryPermissionsToGrant() {
         return hasPermissionsToGrant(mandatoryPermissions);
+    }
+
+    /**
+     * Checks if there are any optional permission to be granted
+     * @return True if there is at least a optional permission which shall be granted
+     */
+    protected boolean hasOptionalPermissionsToGrant() {
+        return hasPermissionsToGrant(optionalPermissions);
     }
 
     /** Starts the permissions ask process */

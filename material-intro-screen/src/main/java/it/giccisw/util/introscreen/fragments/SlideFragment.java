@@ -70,7 +70,7 @@ public class SlideFragment extends SlideFragmentBase {
 
         messageButton.setTextColor(ContextCompat.getColor(getContext(), backgroundColor));
 
-        fixForPermissions();
+        fixForPermissions(hasMandatoryPermissionsToGrant(), hasOptionalPermissionsToGrant());
 
         return view;
     }
@@ -81,10 +81,10 @@ public class SlideFragment extends SlideFragmentBase {
     }
 
     @Override
-    protected boolean fixForPermissions()
+    protected void fixForPermissions(boolean hasMandatoryPermissionsToGrant, boolean hasOptionalPermissionsToGrant)
     {
         // show the button if there are any permission which shall be granted
-        boolean hasAnyPermissionToGrant = hasAnyPermissionsToGrant();
+        boolean hasAnyPermissionToGrant = hasMandatoryPermissionsToGrant || hasOptionalPermissionsToGrant;
         messageButton.setText(grantPermissionStringRes);
         messageButton.setVisibility(hasAnyPermissionToGrant ? View.VISIBLE : View.INVISIBLE);
         messageButton.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +93,5 @@ public class SlideFragment extends SlideFragmentBase {
                 askForPermissions();
             }
         });
-
-        return super.fixForPermissions();
     }
 }

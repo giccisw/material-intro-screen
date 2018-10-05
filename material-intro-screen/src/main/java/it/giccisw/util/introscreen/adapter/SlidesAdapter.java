@@ -6,9 +6,9 @@ import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import it.giccisw.util.introscreen.BuildConfig;
@@ -21,10 +21,10 @@ public class SlidesAdapter extends FragmentPagerAdapter {
     private static final String TAG = "SlidesAdapter";
 
     /** List of available slides, all of them */
-    private final List<SlideFragmentBase> fragments = new ArrayList<>();
+    private final ArrayList<SlideFragmentBase> fragments = new ArrayList<>();
 
     /** If true, the user can pass past that slide */
-    private final List<Boolean> canPass = new ArrayList<>();
+    private final ArrayList<Boolean> canPass = new ArrayList<>();
 
     /** The number of accessible slide */
     private int numAccessibleSlides;
@@ -62,11 +62,22 @@ public class SlidesAdapter extends FragmentPagerAdapter {
     @Override
     public Parcelable saveState()
     {
-        if (canPass.size() == 0) return null;
+        if (fragments.size() == 0) return null;
+
         Bundle state = new Bundle();
-        boolean[] b = new boolean[canPass.size()];
-        for (int i = 0; i < b.length; i++) b[i] = canPass.get(i);
-        state.putBooleanArray("canPass", b);
+
+        // save fragments' classes, arguments and canPass state
+        ArrayList<Class> classes = new ArrayList<>();
+        ArrayList<Bundle> arguments = new ArrayList<>();
+        for (Fragment f : fragments) {
+            classes.add(f.getClass());
+            arguments.add(f.getArguments());
+        }
+        state.putSerializable("classes", classes);
+        state.putSerializable("arguments", arguments);
+        state.putSerializable("canPass", canPass);
+        state.putInt("numAccessibleSlides", numAccessibleSlides);
+
         if (BuildConfig.DEBUG) Log.d(TAG, "Saved state: " + state);
         return state;
     }
@@ -75,11 +86,32 @@ public class SlidesAdapter extends FragmentPagerAdapter {
     public void restoreState(Parcelable state, ClassLoader loader)
     {
         if (BuildConfig.DEBUG) Log.d(TAG, "Restoring state: " + state);
-//        if (state != null) {
-//            Bundle bundle = (Bundle) state;
-//            bundle.setClassLoader(loader);
-//
-//        }
+        if (state == null) return;
+
+        // get bundle and set class loader
+        Bundle bundle = (Bundle) state;
+        bundle.setClassLoader(loader);
+
+        // retrieve saved elements
+        ArrayList<Class<? extends SlideFragmentBase>>
+                classes = (ArrayList<Class<? extends SlideFragmentBase>>) bundle.getSerializable("classes");
+        ArrayList<Bundle> arguments = (ArrayList<Bundle>) bundle.getSerializable("arguments");
+        ArrayList<Boolean> canPass = (ArrayList<Boolean>) bundle.getSerializable("canPass");
+        numAccessibleSlides = bundle.getInt("numAccessibleSlides");
+
+        // recreate fragments
+        for (int i = 0; i < classes.size(); i++) {
+            try {
+                SlideFragmentBase f = classes.get(i).newInstance();
+                f.setArguments(arguments.get(i));
+                fragments.add(f);
+                this.canPass.add(canPass.get(i));
+            } catch (Exception e) {
+                if (BuildConfig.DEBUG) Log.e(TAG, "Unable to create Fragment from class " + classes.get(i), e);;
+            }
+        }
+
+        notifyDataSetChanged();
     }
 
     /**
@@ -104,7 +136,7 @@ public class SlidesAdapter extends FragmentPagerAdapter {
 
         if (BuildConfig.DEBUG) Log.d(TAG, "Adding new slide " + fragment);
         fragments.add(fragment);
-        canPass.add(true);
+        canPass.add(fragment.onSlideAttached());
 
         // recalculate the number of accessible slides and notify data set change
         recalculateAccessibleSlides();
